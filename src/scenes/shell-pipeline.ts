@@ -19,8 +19,8 @@ import { type SceneSpec, BLUE, GREEN, ORANGE, PURPLE, TEAL, GRAY, RED } from 're
 export const shellPipeline: SceneSpec = {
   id: 'shell-pipeline',
   title: 'What the shell does with a line',
-  canvas: { width: 840, height: 900 },
-  grid: { cols: [1, 1, 1], rows: [0.62, 0.62, 1.2, 0.62, 0.95], gap: 0.34, padding: 0.44 },
+  canvas: { width: 840, height: 800 },
+  grid: { cols: [1, 1, 1], rows: [0.62, 0.62, 1.2, 0.62, 0.95], gap: 0.24, padding: 0.44 },
   nodes: [
     { id: 'sp-line', label: 'You type a line', sub: '$ ls -l *.txt', kind: 'symbol', color: GRAY, icon: 'terminal', cell: [1, 0] },
     { id: 'sp-split', label: 'Split into words', sub: 'command + arguments', kind: 'symbol', color: TEAL, icon: 'gears', cell: [1, 1] },
