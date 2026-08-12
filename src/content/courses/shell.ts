@@ -97,7 +97,8 @@ export const shell: Course = {
       id: 'finding',
       heading: 'PATH, builtins & exit codes',
       scene: 'shell-pipeline',
-      focus: FINDING,
+      focus: [],
+      highlight: FINDING,
       slide: {
         title: 'PATH, builtins & exit codes',
         body: [

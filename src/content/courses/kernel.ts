@@ -14,7 +14,7 @@ import type { Course } from 'reveal-engine'
 
 // The whole scene — solidified wholesale on entry (§1) so the full diagram redraws.
 const MS_ALL = [
-  'bs-boot', 'bs-b1', 'bs-b2', 'bs-b3', 'bs-b4', 'bs-b5', 'bs-b6',
+  'bs-boot', 'bs-b1', 'bs-b2', 'bs-b3', 'bs-b3a', 'bs-b3b', 'bs-b3c', 'bs-b4', 'bs-b5', 'bs-b6',
   'bs-user', 'bs-app', 'bs-shell', 'bs-libc',
   'bs-syscall',
   'bs-kernel', 'bs-sched', 'bs-mem', 'bs-vfs', 'bs-net',
@@ -25,7 +25,7 @@ const MS_ALL = [
 // ── Pass 1: the boot ribbon, climbing bottom → top (each rung + the layer it brings alive) ──
 const FIRMWARE = ['bs-b1', 'bs-hw', 'bs-cpu', 'bs-ram', 'bs-disk', 'bs-nic'] // §2 — rung 1, on the metal
 const BOOTLOADER = ['bs-b1', 'bs-b2', 'bs-b3'] // §3 — rung 2, GRUB
-const KERNEL_BOOT = ['bs-b3', 'bs-b4', 'bs-kernel', 'bs-sched', 'bs-mem', 'bs-vfs', 'bs-net', 'bs-drivers'] // §4 — rungs 3–4, the kernel layer lights up
+const KERNEL_BOOT = ['bs-b3', 'bs-b3a', 'bs-b3b', 'bs-b3c', 'bs-b4', 'bs-kernel', 'bs-sched', 'bs-mem', 'bs-vfs', 'bs-net', 'bs-drivers'] // §4 — rungs 3–4 (kernel sub-steps) + the kernel layer lights up
 const INIT = ['bs-b5', 'bs-user', 'bs-app', 'bs-shell', 'bs-libc'] // §5 — rung 5, init populates userspace
 const USERSPACE = ['bs-b6', 'bs-user', 'bs-app', 'bs-shell', 'bs-libc'] // §6 — rung 6, the shell (top of the ladder)
 

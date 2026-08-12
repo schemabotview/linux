@@ -32,12 +32,22 @@ export const machineStack: SceneSpec = {
     //    shell at the top) so each stage sits beside the layer it brings alive. Read bottom→top = 1→6.
     {
       id: 'bs-boot', label: 'Boot · builds bottom-up', kind: 'container', color: GRAY, icon: 'workflow', cell: [0, 0, 1, 5],
-      layout: { cols: [1], rows: [1, 1, 1, 1, 1, 1], gap: 0.22, padding: 0.3 },
+      // the kernel rung (index 3) is taller — it holds the kernel's early-boot sub-steps.
+      layout: { cols: [1], rows: [1, 1, 1, 2.6, 1, 1], gap: 0.22, padding: 0.3 },
       children: [
         { id: 'bs-b6', label: '6 · shell', sub: 'the prompt', kind: 'symbol', color: ORANGE, icon: 'terminal', cell: [0, 0] },
         { id: 'bs-b5', label: '5 · init', sub: 'PID 1', kind: 'symbol', color: GREEN, icon: 'workflow', cell: [0, 1] },
         { id: 'bs-b4', label: '4 · mount /', sub: 'real disk', kind: 'symbol', color: TEAL, icon: 'disk', cell: [0, 2] },
-        { id: 'bs-b3', label: '3 · kernel', sub: 'decompress + drivers', kind: 'symbol', color: PURPLE, icon: 'engine', cell: [0, 3] },
+        // rung 3 — the kernel's early boot, its sub-steps restored (matches §4's narrated sequence)
+        {
+          id: 'bs-b3', label: '3 · kernel', kind: 'container', color: PURPLE, icon: 'engine', cell: [0, 3],
+          layout: { cols: [1], rows: [1, 1, 1], gap: 0.22, padding: 0.34 },
+          children: [
+            { id: 'bs-b3a', label: 'decompress', sub: 'unpack vmlinuz', kind: 'symbol', color: BLUE, icon: 'box', cell: [0, 0] },
+            { id: 'bs-b3b', label: 'initramfs', sub: 'root in RAM', kind: 'symbol', color: ORANGE, icon: 'disk', cell: [0, 1] },
+            { id: 'bs-b3c', label: 'drivers', sub: 'detect hardware', kind: 'symbol', color: GREEN, icon: 'plug', cell: [0, 2] },
+          ],
+        },
         { id: 'bs-b2', label: '2 · GRUB', sub: 'load the kernel', kind: 'symbol', color: TEAL, icon: 'layers', cell: [0, 4] },
         { id: 'bs-b1', label: '1 · firmware', sub: 'POST', kind: 'symbol', color: BLUE, icon: 'engine', cell: [0, 5] },
       ],
