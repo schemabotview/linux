@@ -164,7 +164,7 @@ export const shell: Course = {
       scene: 'shell-pipeline',
       focus: EXPAND,
       slide: {
-        title: 'Expansion: globs, variables & $( )',
+        title: 'globs, variables & $( )',
         body: [
           'Before running anything, the shell **rewrites** your words. This is the shell\'s superpower — and its most common surprise.',
           '',
