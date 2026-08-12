@@ -6,9 +6,12 @@ import type { Course } from 'reveal-engine'
 //
 // STATUS: §1–§10 authored — Course 3 of 8.
 
-const FH_ALL = ['fh-etc', 'fh-var', 'fh-usr', 'fh-bin', 'fh-home', 'fh-tmp', 'fh-dev', 'fh-proc', 'fh-root']
-const FHS_SYS = ['fh-etc', 'fh-var', 'fh-usr', 'fh-bin'] // §2
-const FHS_YOU = ['fh-home', 'fh-tmp', 'fh-dev', 'fh-proc', 'fh-root'] // §3
+// The `fhs-overview` scene is now a rooted TREE: the root `/`, the top-level dirs, and three
+// grandchildren (/usr/bin, /var/log, /home/sam) that show the nesting. FH_ALL = every node, so
+// scene entry (§1, §10) solidifies the whole tree; the bands light each dir with its lineage.
+const FH_ALL = ['fh-slash', 'fh-etc', 'fh-var', 'fh-usr', 'fh-bin', 'fh-home', 'fh-tmp', 'fh-dev', 'fh-proc', 'fh-root', 'fh-usrbin', 'fh-varlog', 'fh-homesam']
+const FHS_SYS = ['fh-etc', 'fh-var', 'fh-usr', 'fh-bin', 'fh-usrbin', 'fh-varlog'] // §2 — system dirs + their children
+const FHS_YOU = ['fh-home', 'fh-tmp', 'fh-dev', 'fh-proc', 'fh-root', 'fh-homesam'] // §3 — yours + virtual + ~
 
 const FT = ['ft-all'] // §4
 const PM = ['pm-all'] // §5–§6
@@ -196,7 +199,6 @@ export const filesystem: Course = {
           '- **root** (UID 0) bypasses every check — total power; **`sudo <cmd>`** runs one command as root',
           '- Rule: work as a normal user, reach for `sudo` only when you truly need it',
           '',
-          'Permissions are the whole security model — and now you can both read and set them.',
         ].join('\n'),
       },
       beats: [

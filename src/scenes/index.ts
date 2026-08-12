@@ -49,7 +49,8 @@ import { capShip } from './cap-ship.ts'
 // Course 2 (`shell`): `shell-pipeline` (the read-eval loop spine — the whole course tours this one
 // control-flow diagram, §1–§7) + `redirection` (streams & pipes, whole-canvas code). (The old
 // `shell-overview` anatomy board was retired — half peers, half a duplicate of this flow's nodes.)
-// Course 3 (`filesystem`): `fhs-overview` (the / tree board) + whole-canvas `fs-tree` (paths) &
+// Course 3 (`filesystem`): `fhs-overview` (the FHS as a real rooted / tree — nodes + containment
+// edges, three branches drilled one level deeper) + whole-canvas `fs-tree` (paths) &
 // `permissions`, + flow scenes `inodes-links` (name→inode→data) and `mounts-vfs` (one tree, many disks).
 // Course 4 (`processes`): `process-lifecycle` (fork→exec→states→exit spine) + `signals` (whole-canvas
 // code) + `proc-monitoring` (ps/top/nice/cgroups board).
