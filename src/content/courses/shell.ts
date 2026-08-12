@@ -131,7 +131,8 @@ export const shell: Course = {
       id: 'the-loop',
       heading: 'The shell\'s read-eval loop',
       scene: 'shell-pipeline',
-      focus: READSPLIT,
+      highlight: READSPLIT,
+      focus: [],
       slide: {
         title: 'The shell\'s read-eval loop',
         body: [

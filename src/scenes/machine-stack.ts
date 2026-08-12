@@ -32,10 +32,20 @@ export const machineStack: SceneSpec = {
     //    shell at the top) so each stage sits beside the layer it brings alive. Read bottom→top = 1→6.
     {
       id: 'bs-boot', label: 'Boot · builds bottom-up', kind: 'container', color: GRAY, icon: 'workflow', cell: [0, 0, 1, 5],
-      // the kernel rung (index 3) is taller — it holds the kernel's early-boot sub-steps.
-      layout: { cols: [1], rows: [1, 1, 1, 2.6, 1, 1], gap: 0.22, padding: 0.3 },
+      // the two rungs with real sub-structure — userspace (index 0) and kernel (index 3) — are
+      // taller so they can hold their early-boot sub-steps.
+      layout: { cols: [1], rows: [2.6, 1, 1, 2.6, 1, 1], gap: 0.22, padding: 0.3 },
       children: [
-        { id: 'bs-b6', label: '6 · shell', sub: 'the prompt', kind: 'symbol', color: ORANGE, icon: 'terminal', cell: [0, 0] },
+        // rung 6 — what init brings up: background services, the login, and finally your shell
+        {
+          id: 'bs-b6', label: '6 · userspace', kind: 'container', color: ORANGE, icon: 'users', cell: [0, 0],
+          layout: { cols: [1], rows: [1, 1, 1], gap: 0.22, padding: 0.34 },
+          children: [
+            { id: 'bs-b6a', label: 'services', sub: 'sshd · cron', kind: 'symbol', color: BLUE, icon: 'server', cell: [0, 0] },
+            { id: 'bs-b6b', label: 'login', sub: 'getty', kind: 'symbol', color: PURPLE, icon: 'key', cell: [0, 1] },
+            { id: 'bs-b6c', label: 'shell', sub: 'bash', kind: 'symbol', color: ORANGE, icon: 'terminal', cell: [0, 2] },
+          ],
+        },
         { id: 'bs-b5', label: '5 · init', sub: 'PID 1', kind: 'symbol', color: GREEN, icon: 'workflow', cell: [0, 1] },
         { id: 'bs-b4', label: '4 · mount /', sub: 'real disk', kind: 'symbol', color: TEAL, icon: 'disk', cell: [0, 2] },
         // rung 3 — the kernel's early boot, its sub-steps restored (matches §4's narrated sequence)

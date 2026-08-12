@@ -15,6 +15,7 @@ import type { Course } from 'reveal-engine'
 // The whole scene — solidified wholesale on entry (§1) so the full diagram redraws.
 const MS_ALL = [
   'bs-boot', 'bs-b1', 'bs-b2', 'bs-b3', 'bs-b3a', 'bs-b3b', 'bs-b3c', 'bs-b4', 'bs-b5', 'bs-b6',
+  'bs-b6a', 'bs-b6b', 'bs-b6c',
   'bs-user', 'bs-app', 'bs-shell', 'bs-libc',
   'bs-syscall',
   'bs-kernel', 'bs-sched', 'bs-mem', 'bs-vfs', 'bs-net',
@@ -27,7 +28,7 @@ const FIRMWARE = ['bs-b1', 'bs-hw', 'bs-cpu', 'bs-ram', 'bs-disk', 'bs-nic'] // 
 const BOOTLOADER = ['bs-b1', 'bs-b2', 'bs-b3'] // §3 — rung 2, GRUB
 const KERNEL_BOOT = ['bs-b3', 'bs-b3a', 'bs-b3b', 'bs-b3c', 'bs-b4', 'bs-kernel', 'bs-sched', 'bs-mem', 'bs-vfs', 'bs-net', 'bs-drivers'] // §4 — rungs 3–4 (kernel sub-steps) + the kernel layer lights up
 const INIT = ['bs-b5', 'bs-user', 'bs-app', 'bs-shell', 'bs-libc'] // §5 — rung 5, init populates userspace
-const USERSPACE = ['bs-b6', 'bs-user', 'bs-app', 'bs-shell', 'bs-libc'] // §6 — rung 6, the shell (top of the ladder)
+const USERSPACE = ['bs-b6', 'bs-b6a', 'bs-b6b', 'bs-b6c', 'bs-user', 'bs-app', 'bs-shell', 'bs-libc'] // §6 — rung 6 (services/login/shell) + the userspace layer
 
 // ── Pass 2: the layer cake, descending top → bottom (a running program's request path) ──
 const BOUNDARY = ['bs-user', 'bs-app', 'bs-shell', 'bs-libc', 'bs-syscall', 'bs-kernel'] // §7 — ring 3 / the door / ring 0
@@ -60,7 +61,7 @@ export const kernel: Course = {
           '- **Open source** — anyone can read, change, and ship it; that is why it runs **most of the internet**, Android, and the cloud',
           '',
           '### Two ways to read this one diagram',
-          '- **Boot climbs UP** — the numbered ribbon on the left (`1 firmware → 6 shell`): the machine comes alive from the bare metal up',
+          '- **Boot climbs UP** — the numbered ribbon on the left (`1 firmware → 6 userspace`): the machine comes alive from the bare metal up, ending at your shell',
           '- **Runtime reads DOWN** — the stacked layers: your program on top calls *down* through the kernel to the hardware',
           '',
           'Same stack, two directions. Let\'s **climb it** as it boots, then **come back down** as it runs.',
