@@ -22,16 +22,17 @@ import { type SceneSpec, BLUE, GREEN, ORANGE, PURPLE, TEAL, GRAY, RED, YELLOW } 
 export const machineStack: SceneSpec = {
   id: 'machine-stack',
   title: 'The machine: built bottom-up, used top-down',
-  canvas: { width: 1280, height: 980 },
-  // col 0 = the boot ribbon; cols 1–4 = the layer cake. Rows mirror `kernel-internals`.
-  grid: { cols: [0.8, 1, 1, 1, 1], rows: [1, 0.5, 1, 0.5, 1], gap: 0.3, padding: 0.4 },
+  canvas: { width: 1440, height: 980 },
+  // col 0 = the boot ribbon (widened to ~a stack-tile's width so its 2-line chips read clearly);
+  // cols 1–4 = the layer cake. Rows mirror `kernel-internals`.
+  grid: { cols: [1.35, 1, 1, 1, 1], rows: [1, 0.5, 1, 0.5, 1], gap: 0.3, padding: 0.4 },
   labelCap: 15,
   nodes: [
     // ── the boot ribbon: the same six stages as boot-chain, but ASCENDING (metal at the bottom,
     //    shell at the top) so each stage sits beside the layer it brings alive. Read bottom→top = 1→6.
     {
       id: 'bs-boot', label: 'Boot · builds bottom-up', kind: 'container', color: GRAY, icon: 'workflow', cell: [0, 0, 1, 5],
-      layout: { cols: [1], rows: [1, 1, 1, 1, 1, 1], gap: 0.24, padding: 0.4 },
+      layout: { cols: [1], rows: [1, 1, 1, 1, 1, 1], gap: 0.22, padding: 0.3 },
       children: [
         { id: 'bs-b6', label: '6 · shell', sub: 'the prompt', kind: 'symbol', color: ORANGE, icon: 'terminal', cell: [0, 0] },
         { id: 'bs-b5', label: '5 · init', sub: 'PID 1', kind: 'symbol', color: GREEN, icon: 'workflow', cell: [0, 1] },

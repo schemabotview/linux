@@ -1,7 +1,6 @@
 import type { SceneSpec } from 'reveal-engine'
 import { machineStack } from './machine-stack.ts'
 import { shellPipeline } from './shell-pipeline.ts'
-import { shellOverview } from './shell-overview.ts'
 import { redirection } from './redirection.ts'
 import { fhsOverview } from './fhs-overview.ts'
 import { fsTree } from './fs-tree.ts'
@@ -47,8 +46,9 @@ import { capShip } from './cap-ship.ts'
 // Course 1 (`kernel`): `machine-stack` — ONE scene fusing the boot timeline and the layer cake:
 // boot climbs the left ribbon (built bottom-up), runtime descends the layers (used top-down). It
 // replaced the old two-scene split (`boot-chain` + `kernel-internals`).
-// Course 2 (`shell`): `shell-overview` (command anatomy board) + `shell-pipeline` (the read-eval
-// loop spine) + `redirection` (streams & pipes, whole-canvas code).
+// Course 2 (`shell`): `shell-pipeline` (the read-eval loop spine — the whole course tours this one
+// control-flow diagram, §1–§7) + `redirection` (streams & pipes, whole-canvas code). (The old
+// `shell-overview` anatomy board was retired — half peers, half a duplicate of this flow's nodes.)
 // Course 3 (`filesystem`): `fhs-overview` (the / tree board) + whole-canvas `fs-tree` (paths) &
 // `permissions`, + flow scenes `inodes-links` (name→inode→data) and `mounts-vfs` (one tree, many disks).
 // Course 4 (`processes`): `process-lifecycle` (fork→exec→states→exit spine) + `signals` (whole-canvas
@@ -64,7 +64,6 @@ import { capShip } from './cap-ship.ts'
 const scenes: Record<string, SceneSpec> = {
   [machineStack.id]: machineStack,
   [shellPipeline.id]: shellPipeline,
-  [shellOverview.id]: shellOverview,
   [redirection.id]: redirection,
   [fhsOverview.id]: fhsOverview,
   [fsTree.id]: fsTree,

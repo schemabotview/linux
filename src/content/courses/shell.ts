@@ -1,17 +1,20 @@
 import type { Course } from 'reveal-engine'
 
-// Course 2 — "The shell & command line" (the DRIVE stage). It opens on the `shell-overview` anatomy
-// board (§1–§3), rides the `shell-pipeline` read-eval loop as its spine (§4–§7), detours to the
-// `redirection` whole-canvas scene for streams & pipes (§8–§9), and bookends back on the pipeline
-// (§10). Solid-tour reveal: 1 beat = 1 section; each scene solidifies on entry.
+// Course 2 — "The shell & command line" (the DRIVE stage). It rides the `shell-pipeline` read-eval
+// loop as its single spine for §1–§7 — the whole course tours the same control-flow diagram, the
+// camera zooming one band at a time — then detours to the `redirection` whole-canvas scene for
+// streams & pipes (§8–§9) and bookends back on the pipeline (§10). (The old `shell-overview` anatomy
+// board was retired: half its tiles were true peers, half silently duplicated this flow's find/exit
+// nodes — so command anatomy now frames the typed line at the top of the pipeline instead.)
+// Solid-tour reveal: 1 beat = 1 section; each scene solidifies on entry.
 //
 // STATUS: §1–§10 authored — Course 2 of 8.
 
-const OV_ALL = ['ov-cmd', 'ov-opts', 'ov-args', 'ov-path', 'ov-builtin', 'ov-exit']
-const ANATOMY = ['ov-cmd', 'ov-opts', 'ov-args'] // §2
-const FINDING = ['ov-path', 'ov-builtin', 'ov-exit'] // §3
-
 const PIPE_ALL = ['sp-line', 'sp-split', 'sp-expand', 'se-glob', 'se-var', 'se-cmd', 'se-quote', 'sp-find', 'sp-run', 'sr-fork', 'sr-wait', 'sr-exit']
+// §2 & §3 keep the WHOLE loop framed (focus: []) so the reader never loses the outer flow, and only
+// LIGHT their band via `highlight`. §4+ then begin the band-by-band camera zoom down the pipeline.
+const ANATOMY = ['sp-line'] // §2 — light the typed line, broken into command · options · arguments in the slide
+const FINDING = ['sp-find', 'sr-exit'] // §3 — light where it's found (PATH/builtin) + how it reports back ($?)
 const READSPLIT = ['sp-line', 'sp-split'] // §4
 const EXPAND = ['sp-expand', 'se-glob', 'se-var', 'se-cmd', 'se-quote'] // §5–§6
 const FIND_RUN = ['sp-find', 'sp-run', 'sr-fork', 'sr-wait', 'sr-exit'] // §7
@@ -25,7 +28,7 @@ export const shell: Course = {
     {
       id: 'what-is-a-shell',
       heading: 'What a shell is',
-      scene: 'shell-overview',
+      scene: 'shell-pipeline',
       focus: [],
       slide: {
         title: 'What a shell is',
@@ -48,15 +51,16 @@ export const shell: Course = {
       beats: [
         {
           line: "The last course ended by handing you a prompt — that little symbol blinking on the screen, waiting. It's time to explain what that prompt actually is, because it's the single most important tool you'll use on a Linux system. The prompt belongs to a program called the shell, and the shell is how you drive the machine by typing to it. At its heart the shell does something very simple, in a loop: it reads a line you type, it runs that line, it shows you whatever came back, and then it prints the prompt again and waits for the next line. If you took the first course, this loop should sound familiar — it's the same read-eval-print idea, but here it's driving the entire operating system instead of one language. Every line you type is a command, and a command is just a program to run, usually followed by some options that adjust how it behaves and some arguments that say what to act on. The default shell on almost every Linux system is called bash — there are others like zsh and fish, but bash is the standard and it's what we'll use throughout. Now, you might wonder why bother typing commands at all when there are graphical interfaces. Three reasons that matter enormously. First, it's precise and repeatable: a typed command is exact, and you can save it into a file to run again forever, which is the whole basis of automation later in this series. Second, it composes: small commands snap together into powerful ones through a mechanism called pipes, which we'll get to. And third, it is genuinely everywhere — every Linux machine has a shell, including the headless servers in a data center that have no screen or mouse at all; the command line is often the only way in. So let's start by naming the parts of a command, and then we'll watch the shell pull one apart, word by word.",
-          delta: [{ kind: 'solidify', ids: OV_ALL }],
+          delta: [{ kind: 'solidify', ids: PIPE_ALL }],
         },
       ],
     },
     {
       id: 'anatomy',
       heading: 'Command · options · arguments',
-      scene: 'shell-overview',
-      focus: ANATOMY,
+      scene: 'shell-pipeline',
+      focus: [],
+      highlight: ANATOMY,
       slide: {
         title: 'Command · options · arguments',
         body: [
@@ -92,7 +96,7 @@ export const shell: Course = {
     {
       id: 'finding',
       heading: 'PATH, builtins & exit codes',
-      scene: 'shell-overview',
+      scene: 'shell-pipeline',
       focus: FINDING,
       slide: {
         title: 'PATH, builtins & exit codes',
