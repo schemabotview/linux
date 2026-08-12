@@ -12,8 +12,8 @@ import { type SceneSpec, BLUE, GREEN, ORANGE, PURPLE, TEAL, GRAY, RED, YELLOW } 
 export const processLifecycle: SceneSpec = {
   id: 'process-lifecycle',
   title: 'The life of a process',
-  canvas: { width: 900, height: 900 },
-  grid: { cols: [1, 1, 1], rows: [0.7, 0.72, 1.15, 0.7, 0.8], gap: 0.34, padding: 0.42 },
+  canvas: { width: 600, height: 800 },
+  grid: { cols: [1, 1, 1], rows: [0.7, 0.72, 1.15, 0.7, 0.8], gap: 0.24, padding: 0.42 },
   nodes: [
     { id: 'pl-parent', label: 'Parent process', sub: 'e.g. your shell', kind: 'symbol', color: GRAY, icon: 'terminal', cell: [1, 0] },
     { id: 'pl-fork', label: 'fork()', sub: 'clone → 2 identical procs', kind: 'symbol', color: TEAL, icon: 'copy', cell: [0, 1] },

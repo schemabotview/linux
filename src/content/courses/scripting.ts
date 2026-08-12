@@ -260,7 +260,6 @@ export const scripting: Course = {
           '### The discipline',
           '- Safety header + `trap` + `getopts` + `shellcheck` = a script you can hand to anyone and schedule with confidence',
           '',
-          'You can now write real, robust bash. Let\'s recap — and set up the capstone.',
         ].join('\n'),
       },
       beats: [

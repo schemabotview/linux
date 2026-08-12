@@ -1,14 +1,18 @@
 import type { Course } from 'reveal-engine'
 
-// Course 5 — "Text processing & pipelines" (the TRANSFORM stage). Opens on the `text-overview`
-// board (§1), gives each tool its own whole-canvas scene (§2–§7: grep/regex, sed, awk, reshape,
-// find/xargs), then returns to the board to COMPOSE them (§8) and choose between them (§9), with a
-// §10 bookend. Solid-tour reveal: 1 beat = 1 section.
+// Course 5 — "Text processing & pipelines" (the TRANSFORM stage). Opens on the `text-pipeline` flow
+// spine (§1 — stdin▸filters▸stdout), gives each tool its own whole-canvas scene (§2–§7: grep/regex,
+// sed, awk, reshape, find/xargs), then COMPOSES them on the `pipeline-example` worked flow (§8),
+// chooses between them on the `tool-decision` fork (§9), and recaps on the pipeline (§10). Solid-tour
+// reveal: 1 beat = 1 section. (Retired the `text-overview` board — it hid the point, composition.)
 //
 // STATUS: §1–§10 authored — Course 5 of 8.
 
-const TO_ALL = ['to-grep', 'to-sed', 'to-awk', 'to-cols', 'to-count', 'to-find']
-const DECIDE = ['to-grep', 'to-sed', 'to-awk'] // §9
+// The old `text-overview` board is retired. §1/§10 ride the `text-pipeline` flow spine, §8 the
+// `pipeline-example` worked flow, §9 the `tool-decision` fork. Each solidifies its whole scene.
+const TP = ['tp-stdin', 'tp-grep', 'tp-sed', 'tp-awk', 'tp-cols', 'tp-count', 'tp-stdout', 'tp-find'] // §1, §10
+const PE = ['pe-log', 'pe-grep', 'pe-awk', 'pe-sort1', 'pe-uniq', 'pe-sort2', 'pe-head', 'pe-out'] // §8
+const TD = ['td-q', 'td-grep', 'td-sed', 'td-awk', 'td-cols', 'td-find'] // §9
 
 const GP = ['gp-all']
 const SD = ['sd-all']
@@ -23,7 +27,7 @@ export const text: Course = {
     {
       id: 'unix-philosophy',
       heading: 'The Unix philosophy',
-      scene: 'text-overview',
+      scene: 'text-pipeline',
       focus: [],
       slide: {
         title: 'The Unix philosophy',
@@ -44,7 +48,7 @@ export const text: Course = {
       beats: [
         {
           line: "Here's a fact about Linux that turns into a superpower once you lean into it: almost everything on the system is plain text. Your logs are text, your configuration in slash-etc is text, the output of nearly every command is text, your data files — CSVs, reports — are text. And because so much is text, the tools that slice, search, and reshape text become some of the most valuable skills you can have; a person fluent with them can answer questions about a system in seconds that would otherwise take a custom script or a spreadsheet. All of these tools grow from a single design idea, the Unix philosophy, and it's worth stating plainly because it explains why they feel the way they do: write programs that each do one thing well, and make each one read from standard input and write to standard output. That's it. No single tool tries to do everything. Instead, because they all speak the same interface of stdin and stdout, you snap them together with the pipes we learned in Course two, building up exactly the custom tool you need for this one moment out of small, sharp, reusable pieces. The classic members of this toolkit are the ones on the board: grep for searching, sed for editing, awk for working with columns, and a supporting cast — sort, uniq, cut, wc, tr — for reshaping and counting, plus find and xargs for locating files and acting on them in bulk. One more property makes them industrial-strength: they're line-oriented and streaming. They process text one line at a time as it flows past, which means they can chew through a hundred-gigabyte log file without ever trying to load it all into memory — something that would defeat a naive script or a text editor instantly. So here's the plan for this course: we'll meet each tool on its own terms, one per scene, and then — because this is where the real power lives — we'll learn to combine them into single-line data pipelines. Let's start with the one you'll use most: grep.",
-          delta: [{ kind: 'solidify', ids: TO_ALL }],
+          delta: [{ kind: 'solidify', ids: TP }],
         },
       ],
     },
@@ -237,7 +241,7 @@ export const text: Course = {
     {
       id: 'pipeline',
       heading: 'Composing a real pipeline',
-      scene: 'text-overview',
+      scene: 'pipeline-example',
       focus: [],
       slide: {
         title: 'Composing a real pipeline',
@@ -264,15 +268,15 @@ export const text: Course = {
       beats: [
         {
           line: "Let's build a real pipeline, the kind you'd genuinely write on the job, and watch how the small tools combine into something powerful. Here's the question: given a web server's raw access log, who are the top five IP addresses causing server errors? Watch how it comes together, one stage at a time, each stage a tool we've just learned. Stage one: grep space quote-space-five-hundred-space to keep only the lines for requests that returned a five-hundred error — we've filtered the whole log down to just the failures. Pipe that into stage two: awk quote-brace-print-dollar-one, which pulls out just the first column, the IP address, from each of those error lines — now we have a raw list of IPs, one per error. Pipe that into stage three: sort, which brings identical IPs next to each other, because remember, the next tool needs them adjacent. Stage four: uniq dash-c, which collapses those runs of identical IPs and prefixes each with a count of how many times it appeared — now we have each IP paired with its number of errors. Stage five: sort dash-r-n, sorting those counts in reverse numeric order so the worst offender floats to the top. And stage six: head dash-five, keeping just the top five lines. Read the whole thing as a single English sentence: filter to the errors, extract the IP, tally by IP, rank them, and take the top five. Six little tools, five pipes, one line — and you've answered a real operational question that would otherwise mean writing a script or loading the log into a spreadsheet. And here's the part that makes this a durable skill rather than a party trick: this skeleton is endlessly reusable. Change the grep to match a different status code, or a date, or a URL. Change the awk to pull a different column — the requested page instead of the IP. Suddenly the same six-stage pattern answers a completely different question: your most requested pages, your busiest hours, your most common user agents. You learn the shape once and reuse it forever. That composition — small tools, snapped together with pipes — is the entire reason this toolkit is worth mastering. Now, with all six tools in hand, a fair question is: when do you reach for which?",
-          delta: [{ kind: 'solidify', ids: TO_ALL }],
+          delta: [{ kind: 'solidify', ids: PE }],
         },
       ],
     },
     {
       id: 'which-tool',
       heading: 'Which tool when?',
-      scene: 'text-overview',
-      focus: DECIDE,
+      scene: 'tool-decision',
+      focus: [],
       slide: {
         title: 'Which tool when?',
         body: [
@@ -294,14 +298,14 @@ export const text: Course = {
       beats: [
         {
           line: "Because grep, sed, and awk overlap quite a bit, beginners often wonder which one they're supposed to use, and the honest answer is that each has a clear sweet spot, and the guiding principle is to reach for the simplest tool that does the job. Here's the decision guide. If all you're doing is finding lines — show me the lines that contain this, or match this pattern — that's grep, full stop. It's the fastest to type, the easiest to read, and unbeatable at its one job. If you need to change text — a find-and-replace, or deleting certain lines — that's sed, with its s-slash substitution. If your task involves columns, or comparing numbers, or any kind of arithmetic or running total — summing a field, counting by key, filtering on the third column being greater than something — that's awk, because it's the only one of the three that genuinely understands fields and math. If you're working with files themselves rather than their contents — locating them, deleting them, acting on them in bulk — that's find, usually paired with xargs. And when you need to reshape data between stages — slicing columns, ordering, deduplicating — that's the sort, uniq, cut family. The rule to internalize is: use the simplest tool that works. A solution built from grep is easier to read and reason about than one built from sed, which is easier than one built from awk, so if grep suffices, use grep. But — and this is the flip side — don't force the simple tool past its limits. The tell is when you find yourself stacking up grep and cut and sort and a second grep, all to do something with columns and counts; that awkward stack is awk quietly asking to be used, and rewriting it as a single clean awk expression is almost always clearer. So true fluency isn't just knowing all six tools — it's knowing which one fits the shape of the problem, reaching for the simplest that works, and then piping them together when no single one is enough. Let's wrap up.",
-          delta: [{ kind: 'solidify', ids: DECIDE }],
+          delta: [{ kind: 'solidify', ids: TD }],
         },
       ],
     },
     {
       id: 'you-are-here',
       heading: 'You are here',
-      scene: 'text-overview',
+      scene: 'text-pipeline',
       focus: [],
       slide: {
         title: 'You are here',
@@ -325,7 +329,7 @@ export const text: Course = {
       beats: [
         {
           line: "Here's the whole toolkit, and you can now do something genuinely valuable: take raw, messy text — logs, config, data dumps, command output — and turn it into an answer, often in a single line. You've got grep, with regular expressions, to find any shape of text you can describe, in any file, tree, or stream. You've got sed to rewrite and delete text as it flows, safely previewing before ever committing with dash-i. You've got awk, the little language that thinks in columns and can filter on conditions and accumulate running totals — a spreadsheet you drop into a pipe. You've got the reshaping crew — sort, uniq, cut, wc, and tr — and the file-level duo, find and xargs, for locating and acting on files in bulk. And most importantly, you can compose them, snapping small tools together with pipes into custom one-liners, with that top-N-by-frequency idiom — sort, uniq dash-c, sort dash-r-n — ready in your back pocket for any counting question. This is the transform stage of the whole series, and it's a skill that compounds: the more you use it, the faster you reach for it. From here we shift from working with data to operating the machine itself. The next course is administration — managing users and their permissions, controlling services with systemd, installing software with package managers, scheduling jobs with cron, and the basics of networking. And you'll notice these text tools coming right back, because reading logs and parsing system output is the daily bread of administration. You can shape any text on the box now; next, let's learn to run the box.",
-          delta: [{ kind: 'solidify', ids: TO_ALL }],
+          delta: [{ kind: 'solidify', ids: TP }],
         },
       ],
     },

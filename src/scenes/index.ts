@@ -9,8 +9,12 @@ import { inodesLinks } from './inodes-links.ts'
 import { mountsVfs } from './mounts-vfs.ts'
 import { processLifecycle } from './process-lifecycle.ts'
 import { signals } from './signals.ts'
-import { procMonitoring } from './proc-monitoring.ts'
-import { textOverview } from './text-overview.ts'
+import { procWatch } from './proc-watch.ts'
+import { procPriority } from './proc-priority.ts'
+import { procControl } from './proc-control.ts'
+import { textPipeline } from './text-pipeline.ts'
+import { pipelineExample } from './pipeline-example.ts'
+import { toolDecision } from './tool-decision.ts'
 import { grep } from './grep.ts'
 import { sed } from './sed.ts'
 import { awk } from './awk.ts'
@@ -53,9 +57,14 @@ import { capShip } from './cap-ship.ts'
 // edges, three branches drilled one level deeper) + whole-canvas `fs-tree` (paths) &
 // `permissions`, + flow scenes `inodes-links` (name→inode→data) and `mounts-vfs` (one tree, many disks).
 // Course 4 (`processes`): `process-lifecycle` (fork→exec→states→exit spine) + `signals` (whole-canvas
-// code) + `proc-monitoring` (ps/top/nice/cgroups board).
-// Course 5 (`text`): `text-overview` board + a whole-canvas code scene per tool — `grep`, `sed`,
-// `awk`, `sort-uniq` (cut/sort/uniq/wc/tr), `find-xargs`.
+// code) + three whole-canvas code cards for watching & steering — `proc-watch` (ps/top/proc),
+// `proc-priority` (nice/renice), `proc-control` (job control + cgroups). (Retired the
+// `proc-monitoring` board — its zoomed bands were near-empty single tiles.)
+// Course 5 (`text`): a whole-canvas code scene per tool — `grep`, `sed`, `awk`, `sort-uniq`
+// (cut/sort/uniq/wc/tr), `find-xargs` — framed by three data/control-flow scenes: `text-pipeline`
+// (the stdin▸filters▸stdout spine, §1/§10), `pipeline-example` (the top-5-IPs worked pipeline, §8),
+// and `tool-decision` (the "which tool when?" fork, §9). (Retired the `text-overview` peer board —
+// it hid the course's whole point, composition.)
 // Course 6 (`admin`): `admin-overview` board + whole-canvas `users-groups`, `packages`, `scheduling`,
 // and flow scenes `systemd` (unit→service→journal) and `networking` (host→remote + tools).
 // Course 7 (`scripting`): `scripting-overview` board + a whole-canvas code scene per construct —
@@ -73,8 +82,12 @@ const scenes: Record<string, SceneSpec> = {
   [mountsVfs.id]: mountsVfs,
   [processLifecycle.id]: processLifecycle,
   [signals.id]: signals,
-  [procMonitoring.id]: procMonitoring,
-  [textOverview.id]: textOverview,
+  [procWatch.id]: procWatch,
+  [procPriority.id]: procPriority,
+  [procControl.id]: procControl,
+  [textPipeline.id]: textPipeline,
+  [pipelineExample.id]: pipelineExample,
+  [toolDecision.id]: toolDecision,
   [grep.id]: grep,
   [sed.id]: sed,
   [awk.id]: awk,

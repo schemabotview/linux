@@ -11,15 +11,15 @@ import { type SceneSpec, BLUE, GREEN, ORANGE, PURPLE, TEAL, GRAY } from 'reveal-
 export const inodesLinks: SceneSpec = {
   id: 'inodes-links',
   title: 'Names, inodes & links',
-  canvas: { width: 1080, height: 720 },
-  grid: { cols: [1, 1, 1, 1], rows: [0.9, 0.9, 0.9], gap: 0.34, padding: 0.4 },
+  canvas: { width: 780, height: 720 },
+  grid: { cols: [1, 1, 2, 1], rows: [0.9, 0.9, 0.9], gap: 0.34, padding: 0.4 },
   nodes: [
     // the resolution chain, left → right across the middle row
     { id: 'il-name', label: 'filename', sub: '"report.txt"', kind: 'symbol', color: BLUE, icon: 'file', cell: [0, 1] },
     { id: 'il-dirent', label: 'directory entry', sub: 'name → inode #', kind: 'symbol', color: TEAL, icon: 'table', cell: [1, 1] },
     {
       id: 'il-inode', label: 'inode', kind: 'container', color: PURPLE, icon: 'box', cell: [2, 1],
-      layout: { cols: [1], rows: [1, 1], gap: 0.25, padding: 0.5 },
+      layout: { cols: [1], rows: [1, 1], gap: 0.1, padding: 0.05 },
       children: [
         { id: 'il-meta', label: 'metadata', sub: 'perms · owner · size · times', kind: 'symbol', color: GRAY, icon: 'scroll', cell: [0, 0] },
         { id: 'il-ptrs', label: 'block pointers', sub: '→ the data', kind: 'symbol', color: ORANGE, icon: 'share', cell: [0, 1] },

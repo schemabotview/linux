@@ -9,7 +9,7 @@ import { type SceneSpec, BLUE, GREEN, ORANGE, PURPLE, TEAL, GRAY } from 'reveal-
 export const networking: SceneSpec = {
   id: 'networking',
   title: 'Networking basics',
-  canvas: { width: 1120, height: 620 },
+  canvas: { width: 820, height: 520 },
   grid: { cols: [1, 1, 1, 1], rows: [1, 0.85], gap: 0.34, padding: 0.4 },
   nodes: [
     { id: 'nw-host', label: 'your host', sub: 'this machine', kind: 'symbol', color: GRAY, icon: 'server', cell: [0, 0] },

@@ -1,8 +1,9 @@
 import type { Course } from 'reveal-engine'
 
 // Course 4 — "Processes & signals" (the RUN stage). Rides the `process-lifecycle` spine (§1–§5),
-// detours to the `signals` whole-canvas scene (§6), tours the `proc-monitoring` board (§7–§9), and
-// bookends back on the lifecycle (§10). Solid-tour reveal: 1 beat = 1 section.
+// detours to the `signals` whole-canvas scene (§6), then three whole-canvas code cards for watching
+// & steering — `proc-watch` (§7), `proc-priority` (§8), `proc-control` (§9) — and bookends back on
+// the lifecycle (§10). Solid-tour reveal: 1 beat = 1 section.
 //
 // STATUS: §1–§10 authored — Course 4 of 8.
 
@@ -14,10 +15,11 @@ const PL_END = ['pl-exit', 'pl-zombie', 'pl-wait'] // §5
 
 const SG = ['sg-all'] // §6
 
-const PM_ALL = ['pm-proc', 'pm-ps', 'pm-top', 'pm-nice', 'pm-jobs', 'pm-cgroups']
-const PM_LOOK = ['pm-proc', 'pm-ps', 'pm-top'] // §7
-const PM_PRI = ['pm-nice'] // §8
-const PM_CTL = ['pm-jobs', 'pm-cgroups'] // §9
+// §7–§9 are now three whole-canvas code cards (retired the `proc-monitoring` board, whose zoomed
+// bands were near-empty single tiles). Each is one node, solidified on entry, framed `focus: []`.
+const PW = ['pw-all'] // §7 — watch.sh (ps/top/proc)
+const PP = ['pp-all'] // §8 — priority.sh (nice/renice)
+const PC = ['pc-all'] // §9 — control.sh (job control + cgroups)
 
 export const processes: Course = {
   id: 'processes',
@@ -56,7 +58,8 @@ export const processes: Course = {
       id: 'fork',
       heading: 'fork(): cloning a process',
       scene: 'process-lifecycle',
-      focus: PL_BIRTH,
+      highlight: PL_BIRTH,
+      focus: [],
       slide: {
         title: 'fork(): cloning a process',
         body: [
@@ -122,7 +125,7 @@ export const processes: Course = {
           '- **Running / Runnable (`R`)** — on a CPU now, or ready and waiting its turn',
           '- **Sleeping (`S`)** — blocked, waiting for something (I/O, a timer, input). **Most processes, most of the time**',
           '- **Stopped (`T`)** — suspended (you sent it `Ctrl-Z` / `SIGSTOP`)',
-          '- **Zombie (`Z`)** — finished, waiting to be reaped (next section)',
+          '- **Zombie (`Z`)** — finished, waiting to be reaped',
           '',
           '### The scheduler shares time',
           '- Far more processes than cores, so the scheduler gives each a tiny **time slice**, rotating fast → the illusion of *all at once*',
@@ -202,8 +205,8 @@ export const processes: Course = {
     {
       id: 'monitoring-look',
       heading: 'Watching: ps, top & /proc',
-      scene: 'proc-monitoring',
-      focus: PM_LOOK,
+      scene: 'proc-watch',
+      focus: [],
       slide: {
         title: 'Watching: ps, top & /proc',
         body: [
@@ -224,15 +227,15 @@ export const processes: Course = {
       beats: [
         {
           line: "You can't manage what you can't see, so the foundation of working with processes is being able to observe them, and there are three tools for it, ranging from the raw underlying truth to a friendly live view. The rawest is something we've already met: slash-proc. Remember, the kernel exposes a directory for every running process, named by its PID — slash-proc-slash-one-two-three-four — and inside it are files describing that process in complete detail: its state, its memory usage, the files it has open, the command that launched it. This is the ground truth, and here's the thing to appreciate — every other monitoring tool, including the two we're about to discuss, is really just reading slash-proc and formatting it nicely for you. The workhorse command is ps, which takes a snapshot of the processes running at the moment you run it. The incantation you'll use constantly is ps space a-u-x, which lists every process on the system along with who owns it, its PID, how much CPU and memory it's using, its state — those R, S, T, Z letters from earlier — and the command that started it. It's a still photograph, frozen at that instant. When you want a moving picture instead, you reach for top, or its nicer modern cousin htop. These give you a live dashboard that refreshes every second or two, and by default they sort processes by CPU usage, so the biggest resource hog floats right to the top of the screen. This is your first responder tool: when a server is slow or a fan is roaring and you're wondering what on earth is eating this machine, you run top or htop and the culprit is usually sitting right there at the top of the list. And that's the everyday rhythm of process management: you look first with top or htop, you spot the process that's misbehaving, you note its PID, and then you act — either by adjusting its priority, which is next, or by sending it a signal with kill. When you need to find one specific process for a script, ps piped into grep by name gives you its PID. Look first, act second. Now, about that acting — sometimes the problem isn't that a process is broken, it's just that it's taking more than its fair share. For that we adjust priority.",
-          delta: [{ kind: 'solidify', ids: PM_ALL }],
+          delta: [{ kind: 'solidify', ids: PW }],
         },
       ],
     },
     {
       id: 'priority',
       heading: 'Priority: nice & renice',
-      scene: 'proc-monitoring',
-      focus: PM_PRI,
+      scene: 'proc-priority',
+      focus: [],
       slide: {
         title: 'Priority: nice & renice',
         body: [
@@ -256,15 +259,15 @@ export const processes: Course = {
       beats: [
         {
           line: "Sometimes a process isn't misbehaving at all — it's doing exactly what you asked, like compressing a huge backup or crunching a big data job — but it's so CPU-hungry that it's making the rest of the system sluggish and unresponsive. You don't want to kill it; you just want it to back off and let the more important, interactive work go first. That's what process priority is for, and on Linux it's controlled by a charming concept called the nice value. Every process has a niceness, a number on a scale from minus twenty at one end to positive nineteen at the other, and the rule to remember is that lower means higher priority — a lower, more negative number makes a process greedier, grabbing a bigger share of CPU time, while a higher, more positive number makes it back off. The name is a genuine mnemonic: a nicer process, with a higher nice value, is being nice to everyone else by yielding the processor. The default niceness for anything you start is zero, right in the middle. You set it in two ways. To launch something at a lower priority from the start, you prefix it with the nice command — nice dash-n ten, then your command — which is perfect for kicking off a heavy batch job that you're happy to have run slowly in the background without disturbing your interactive work. To change the priority of something that's already running, you use renice, giving it a new value and the target PID. There's one asymmetry worth knowing: making a process nicer, raising its number to yield more, you can always do to your own processes; but making a process greedier, pushing it below zero to demand more than its fair share, requires sudo, because that's a way to hog a shared machine. And the crucial caveat that ties this back to the scheduler: nice values only matter when there's contention. If the CPU has idle capacity, everybody runs freely and niceness is irrelevant; it only comes into play when more processes want the CPU than there are cores, and the scheduler has to decide who waits — that's when a low nice value wins and a high one gracefully steps aside. So niceness tunes a process's share of the CPU. But sometimes you don't want to just bias a share — you want a hard ceiling, an absolute limit no matter what. And you'll also want tighter control over the jobs you launch from your own shell. Let's cover both.",
-          delta: [{ kind: 'solidify', ids: PM_PRI }],
+          delta: [{ kind: 'solidify', ids: PP }],
         },
       ],
     },
     {
       id: 'jobs-cgroups',
       heading: 'Job control & cgroups',
-      scene: 'proc-monitoring',
-      focus: PM_CTL,
+      scene: 'proc-control',
+      focus: [],
       slide: {
         title: 'Job control & cgroups',
         body: [
@@ -286,7 +289,7 @@ export const processes: Course = {
       beats: [
         {
           line: "Two final levers of control, at opposite ends of the scale. The first is job control, which we actually previewed back in Course two — it's how you manage the processes you launch from your own interactive shell. Recall the pieces: ending a command with an ampersand starts it in the background so you get your prompt back immediately; Control-Z suspends whatever's running in the foreground; the jobs command lists everything your shell is managing; and fg and bg resume a job in the foreground or the background. And now, with this course behind you, you can see what job control really is under the hood — it's nothing more than the shell sending the signals we just learned. Control-Z is the shell delivering SIGSTOP; resuming a job is SIGCONT; and you can even kill a job by its job number with kill percent-one. It's signals all the way down. The second lever is at the opposite extreme — system-wide, enforced by the kernel, and far more powerful: cgroups, short for control groups. Where nice merely biases a process's share of the CPU, cgroups let you put a process and all its children into a named group and impose hard, absolute ceilings on it: this group may use at most two CPU cores, at most one gigabyte of memory, at most this much disk bandwidth — and these aren't suggestions, they're enforced. Cross the memory limit, for example, and the kernel doesn't just slow the group down, it starts killing processes in it — that's the out-of-memory killer in action. And here's the payoff that makes cgroups worth knowing about even if you never configure one by hand: this is the foundation that containers are built on. When you run a Docker container or a Kubernetes pod, what's actually happening underneath is cgroups enforcing the resource limits, combined with another kernel feature called namespaces that isolates what each process can see. All the container tooling — Docker, Kubernetes, the whole cloud-native world — is, at bottom, a friendly interface over cgroups and namespaces. There's no magic; it's these same process primitives. And that's the quiet theme of this whole course: from a single Control-C keystroke, to a graceful server shutdown, to a container capped at one gigabyte of RAM, it is all the same small set of ideas — processes, signals, and the scheduler. Let's bring it together.",
-          delta: [{ kind: 'solidify', ids: PM_CTL }],
+          delta: [{ kind: 'solidify', ids: PC }],
         },
       ],
     },

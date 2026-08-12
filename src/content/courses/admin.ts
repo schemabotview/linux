@@ -6,7 +6,7 @@ import type { Course } from 'reveal-engine'
 //
 // STATUS: §1–§10 authored — Course 6 of 8.
 
-const AO_ALL = ['ao-users', 'ao-systemd', 'ao-pkg', 'ao-cron', 'ao-logs', 'ao-net']
+const AO_ALL = ['ao-box', 'ao-users', 'ao-systemd', 'ao-pkg', 'ao-cron', 'ao-logs', 'ao-net']
 
 const UG = ['ug-all']
 const PK = ['pk-all']
@@ -116,7 +116,8 @@ export const admin: Course = {
       id: 'systemd-services',
       heading: 'systemd: managing services',
       scene: 'systemd',
-      focus: SY_SVC,
+      highlight: SY_SVC,
+      focus: [],
       slide: {
         title: 'systemd: managing services',
         body: [
@@ -146,7 +147,8 @@ export const admin: Course = {
       id: 'systemd-logs',
       heading: 'journald, logs & targets',
       scene: 'systemd',
-      focus: SY_LOG,
+      highlight: SY_LOG,
+      focus: [],
       slide: {
         title: 'journald, logs & targets',
         body: [
@@ -264,7 +266,6 @@ export const admin: Course = {
           '### The debugging ladder',
           '- `ip a` (do I have an address?) → `ping` (can I reach it?) → `ss`/`curl` (is the service answering?) — climb it in order',
           '',
-          'That covers *inspecting* the network. The one tool you\'ll live in as a remote operator is **`ssh`**.',
         ].join('\n'),
       },
       beats: [
