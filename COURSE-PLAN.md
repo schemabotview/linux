@@ -100,7 +100,7 @@ everything else stands on, exactly as python's `setup` did.
 
 ## Status
 
-**BUILT.** All 8 courses authored end to end — **41 scenes, 80 sections** (final counts very close
+**BUILT.** All 8 courses authored end to end — **40 scenes, 80 sections** (final counts very close
 to the estimates above), `tsc` clean and `vite build` clean. The arc, scene shapes, and section
 counts came out as planned. This was built autonomously overnight ahead of the usual per-slice
 review — so the owner's review pass (scenes at `#scene/<id>`, courses at `#/<id>`) is the next step,

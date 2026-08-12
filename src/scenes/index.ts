@@ -1,6 +1,5 @@
 import type { SceneSpec } from 'reveal-engine'
-import { bootChain } from './boot-chain.ts'
-import { kernelInternals } from './kernel-internals.ts'
+import { machineStack } from './machine-stack.ts'
 import { shellPipeline } from './shell-pipeline.ts'
 import { shellOverview } from './shell-overview.ts'
 import { redirection } from './redirection.ts'
@@ -45,8 +44,9 @@ import { capShip } from './cap-ship.ts'
 // getScene; content/courses reference these ids. Each course brings its own scenes — a control/
 // data-flow diagram where there's genuine flow, else a reference board of peer topics.
 //
-// Course 1 (`kernel`): `boot-chain` (power → firmware → GRUB → kernel → init → userspace, the
-// spine) + `kernel-internals` (the syscall boundary + the four subsystems, the detour).
+// Course 1 (`kernel`): `machine-stack` — ONE scene fusing the boot timeline and the layer cake:
+// boot climbs the left ribbon (built bottom-up), runtime descends the layers (used top-down). It
+// replaced the old two-scene split (`boot-chain` + `kernel-internals`).
 // Course 2 (`shell`): `shell-overview` (command anatomy board) + `shell-pipeline` (the read-eval
 // loop spine) + `redirection` (streams & pipes, whole-canvas code).
 // Course 3 (`filesystem`): `fhs-overview` (the / tree board) + whole-canvas `fs-tree` (paths) &
@@ -62,8 +62,7 @@ import { capShip } from './cap-ship.ts'
 // Course 8 (`project`): `capstone-spine` build-map board + a whole-canvas stage scene each —
 // `cap-structure`/`-args`/`-collect`/`-transform`/`-report`/`-schedule`/`-service`/`-harden`/`-ship`.
 const scenes: Record<string, SceneSpec> = {
-  [bootChain.id]: bootChain,
-  [kernelInternals.id]: kernelInternals,
+  [machineStack.id]: machineStack,
   [shellPipeline.id]: shellPipeline,
   [shellOverview.id]: shellOverview,
   [redirection.id]: redirection,

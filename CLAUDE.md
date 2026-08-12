@@ -72,11 +72,14 @@ Add each authored `Course` to `courses` (syllabus order) + a `BLURBS` line.
 
 ## Status
 
-**All 8 courses authored — 41 scenes, 80 sections — `tsc` clean, `vite build` clean.** (Built
+**All 8 courses authored — 40 scenes, 80 sections — `tsc` clean, `vite build` clean.** (Built
 autonomously overnight, ahead of the usual per-slice review; owner to review scenes at `#scene/<id>`
 and courses at `#/<id>`.)
 
-- **Course 1 (`kernel`) done** — `boot-chain` spine + `kernel-internals` detour, 10 sections.
+- **Course 1 (`kernel`) done** — `machine-stack` (ONE scene fusing the boot timeline + the layer
+  cake): a two-pass tour — boot climbs the ribbon bottom-up (§1–§6), runtime descends the layers
+  top-down (§7–§9), §10 both-directions bookend. 10 sections. (Replaced the old `boot-chain` +
+  `kernel-internals` two-scene split.)
 - **Course 2 (`shell`) done** — `shell-overview` board + `shell-pipeline` spine + `redirection`, 10.
 - **Course 3 (`filesystem`) done** — `fhs-overview` + `fs-tree`/`permissions` + `inodes-links`/`mounts-vfs`, 10.
 - **Course 4 (`processes`) done** — `process-lifecycle` spine + `signals` + `proc-monitoring`, 10.
