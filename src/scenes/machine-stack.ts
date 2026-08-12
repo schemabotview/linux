@@ -22,28 +22,28 @@ import { type SceneSpec, BLUE, GREEN, ORANGE, PURPLE, TEAL, GRAY, RED, YELLOW } 
 export const machineStack: SceneSpec = {
   id: 'machine-stack',
   title: 'The machine: built bottom-up, used top-down',
-  canvas: { width: 1440, height: 980 },
-  // col 0 = the boot ribbon (widened to ~a stack-tile's width so its 2-line chips read clearly);
-  // cols 1–4 = the layer cake. Rows mirror `kernel-internals`.
-  grid: { cols: [1.35, 1, 1, 1, 1], rows: [1, 0.5, 1, 0.5, 1], gap: 0.3, padding: 0.4 },
+  canvas: { width: 1560, height: 980 },
+  // col 0 = the boot ribbon — widened enough to hold the kernel/userspace sub-steps HORIZONTALLY
+  // (3 chips across); cols 1–4 = the layer cake. Rows mirror `kernel-internals`.
+  grid: { cols: [2.4, 1, 1, 1, 1], rows: [1, 0.5, 1, 0.5, 1], gap: 0.3, padding: 0.4 },
   labelCap: 15,
   nodes: [
     // ── the boot ribbon: the same six stages as boot-chain, but ASCENDING (metal at the bottom,
     //    shell at the top) so each stage sits beside the layer it brings alive. Read bottom→top = 1→6.
     {
       id: 'bs-boot', label: 'Boot · builds bottom-up', kind: 'container', color: GRAY, icon: 'workflow', cell: [0, 0, 1, 5],
-      // the two rungs with real sub-structure — userspace (index 0) and kernel (index 3) — are
-      // taller so they can hold their early-boot sub-steps.
-      layout: { cols: [1], rows: [2.6, 1, 1, 2.6, 1, 1], gap: 0.22, padding: 0.3 },
+      // the two rungs with real sub-structure — userspace (index 0) and kernel (index 3) — lay their
+      // sub-steps out HORIZONTALLY, so they need only a little extra height for the title row.
+      layout: { cols: [1], rows: [1.5, 1, 1, 1.5, 1, 1], gap: 0.22, padding: 0.3 },
       children: [
         // rung 6 — what init brings up: background services, the login, and finally your shell
         {
           id: 'bs-b6', label: '6 · userspace', kind: 'container', color: ORANGE, icon: 'users', cell: [0, 0],
-          layout: { cols: [1], rows: [1, 1, 1], gap: 0.22, padding: 0.34 },
+          layout: { cols: [1, 1, 1], rows: [1], gap: 0.22, padding: 0.34 },
           children: [
-            { id: 'bs-b6a', label: 'services', sub: 'sshd · cron', kind: 'symbol', color: BLUE, icon: 'server', cell: [0, 0] },
-            { id: 'bs-b6b', label: 'login', sub: 'getty', kind: 'symbol', color: PURPLE, icon: 'key', cell: [0, 1] },
-            { id: 'bs-b6c', label: 'shell', sub: 'bash', kind: 'symbol', color: ORANGE, icon: 'terminal', cell: [0, 2] },
+            { id: 'bs-b6a', label: 'services', sub: 'sshd…', kind: 'symbol', color: BLUE, icon: 'server', cell: [0, 0] },
+            { id: 'bs-b6b', label: 'login', sub: 'getty', kind: 'symbol', color: PURPLE, icon: 'key', cell: [1, 0] },
+            { id: 'bs-b6c', label: 'shell', sub: 'bash', kind: 'symbol', color: ORANGE, icon: 'terminal', cell: [2, 0] },
           ],
         },
         { id: 'bs-b5', label: '5 · init', sub: 'PID 1', kind: 'symbol', color: GREEN, icon: 'workflow', cell: [0, 1] },
@@ -51,11 +51,11 @@ export const machineStack: SceneSpec = {
         // rung 3 — the kernel's early boot, its sub-steps restored (matches §4's narrated sequence)
         {
           id: 'bs-b3', label: '3 · kernel', kind: 'container', color: PURPLE, icon: 'engine', cell: [0, 3],
-          layout: { cols: [1], rows: [1, 1, 1], gap: 0.22, padding: 0.34 },
+          layout: { cols: [1, 1, 1], rows: [1], gap: 0.22, padding: 0.34 },
           children: [
-            { id: 'bs-b3a', label: 'decompress', sub: 'unpack vmlinuz', kind: 'symbol', color: BLUE, icon: 'box', cell: [0, 0] },
-            { id: 'bs-b3b', label: 'initramfs', sub: 'root in RAM', kind: 'symbol', color: ORANGE, icon: 'disk', cell: [0, 1] },
-            { id: 'bs-b3c', label: 'drivers', sub: 'detect hardware', kind: 'symbol', color: GREEN, icon: 'plug', cell: [0, 2] },
+            { id: 'bs-b3a', label: 'decompress', sub: 'vmlinuz', kind: 'symbol', color: BLUE, icon: 'box', cell: [0, 0] },
+            { id: 'bs-b3b', label: 'initramfs', sub: 'in RAM', kind: 'symbol', color: ORANGE, icon: 'disk', cell: [1, 0] },
+            { id: 'bs-b3c', label: 'drivers', sub: 'detect HW', kind: 'symbol', color: GREEN, icon: 'plug', cell: [2, 0] },
           ],
         },
         { id: 'bs-b2', label: '2 · GRUB', sub: 'load the kernel', kind: 'symbol', color: TEAL, icon: 'layers', cell: [0, 4] },
