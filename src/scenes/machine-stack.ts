@@ -22,10 +22,10 @@ import { type SceneSpec, BLUE, GREEN, ORANGE, PURPLE, TEAL, GRAY, RED, YELLOW } 
 export const machineStack: SceneSpec = {
   id: 'machine-stack',
   title: 'The machine: built bottom-up, used top-down',
-  canvas: { width: 1560, height: 980 },
+  canvas: { width: 1060, height: 780 },
   // col 0 = the boot ribbon — widened enough to hold the kernel/userspace sub-steps HORIZONTALLY
   // (3 chips across); cols 1–4 = the layer cake. Rows mirror `kernel-internals`.
-  grid: { cols: [2.4, 1, 1, 1, 1], rows: [1, 0.5, 1, 0.5, 1], gap: 0.3, padding: 0.4 },
+  grid: { cols: [2.4, 1, 1, 1, 1], rows: [1, 0.5, 1, 0.5, 1], gap: 0.2, padding: 0.4 },
   labelCap: 15,
   nodes: [
     // ── the boot ribbon: the same six stages as boot-chain, but ASCENDING (metal at the bottom,
@@ -34,7 +34,7 @@ export const machineStack: SceneSpec = {
       id: 'bs-boot', label: 'Boot · builds bottom-up', kind: 'container', color: GRAY, icon: 'workflow', cell: [0, 0, 1, 5],
       // the two rungs with real sub-structure — userspace (index 0) and kernel (index 3) — lay their
       // sub-steps out HORIZONTALLY, so they need only a little extra height for the title row.
-      layout: { cols: [1], rows: [1.5, 1, 1, 1.5, 1, 1], gap: 0.22, padding: 0.3 },
+      layout: { cols: [1], rows: [1.5, 1, 1, 1.5, 1, 1], gap: 0.22, padding: 0.1 },
       children: [
         // rung 6 — what init brings up: background services, the login, and finally your shell
         {
@@ -66,7 +66,7 @@ export const machineStack: SceneSpec = {
     // ── the layer cake (structure), userspace on top → hardware at the bottom ──
     {
       id: 'bs-user', label: 'User space · ring 3', kind: 'container', color: GRAY, icon: 'users', cell: [1, 0, 4, 1],
-      layout: { cols: [1, 1, 1], rows: 1, gap: 0.3, padding: 0.5 },
+      layout: { cols: [1, 1, 1], rows: 1, gap: 0.3, padding: 0.2 },
       children: [
         { id: 'bs-app', label: 'your program', sub: 'ls, python, nginx…', kind: 'symbol', color: BLUE, icon: 'app', cell: [0, 0] },
         { id: 'bs-shell', label: 'shell', sub: 'bash', kind: 'symbol', color: ORANGE, icon: 'terminal', cell: [1, 0] },
@@ -76,7 +76,7 @@ export const machineStack: SceneSpec = {
     { id: 'bs-syscall', label: 'System calls · the only door in', sub: 'read, write, open, fork, mmap…', kind: 'symbol', color: RED, icon: 'shield', cell: [1, 1, 4, 1] },
     {
       id: 'bs-kernel', label: 'Kernel · ring 0', kind: 'container', color: PURPLE, icon: 'engine', cell: [1, 2, 4, 1],
-      layout: { cols: [1, 1, 1, 1], rows: 1, gap: 0.3, padding: 0.5 },
+      layout: { cols: [1, 1, 1, 1], rows: 1, gap: 0.3, padding: 0.2 },
       children: [
         { id: 'bs-sched', label: 'Scheduler', sub: 'shares the CPU', kind: 'symbol', color: GREEN, icon: 'workflow', cell: [0, 0] },
         { id: 'bs-mem', label: 'Memory', sub: 'virtual memory', kind: 'symbol', color: BLUE, icon: 'memory', cell: [1, 0] },

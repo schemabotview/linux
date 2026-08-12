@@ -25,7 +25,7 @@ const MS_ALL = [
 
 // ── Pass 1: the boot ribbon, climbing bottom → top (each rung + the layer it brings alive) ──
 const FIRMWARE = ['bs-b1', 'bs-hw', 'bs-cpu', 'bs-ram', 'bs-disk', 'bs-nic'] // §2 — rung 1, on the metal
-const BOOTLOADER = ['bs-b1', 'bs-b2', 'bs-b3'] // §3 — rung 2, GRUB
+const BOOTLOADER = ['bs-b1', 'bs-b2', 'bs-b3', 'bs-kernel'] // §3 — rung 2, GRUB
 const KERNEL_BOOT = ['bs-b3', 'bs-b3a', 'bs-b3b', 'bs-b3c', 'bs-b4', 'bs-kernel', 'bs-sched', 'bs-mem', 'bs-vfs', 'bs-net', 'bs-drivers'] // §4 — rungs 3–4 (kernel sub-steps) + the kernel layer lights up
 const INIT = ['bs-b5', 'bs-user', 'bs-app', 'bs-shell', 'bs-libc'] // §5 — rung 5, init populates userspace
 const USERSPACE = ['bs-b6', 'bs-b6a', 'bs-b6b', 'bs-b6c', 'bs-user', 'bs-app', 'bs-shell', 'bs-libc'] // §6 — rung 6 (services/login/shell) + the userspace layer
@@ -60,10 +60,6 @@ export const kernel: Course = {
           '- **1991** — Linus Torvalds released a free Unix-like **kernel**; the **GNU** project supplied the userland around it',
           '- **Open source** — anyone can read, change, and ship it; that is why it runs **most of the internet**, Android, and the cloud',
           '',
-          '### Two ways to read this one diagram',
-          '- **Boot climbs UP** — the numbered ribbon on the left (`1 firmware → 6 userspace`): the machine comes alive from the bare metal up, ending at your shell',
-          '- **Runtime reads DOWN** — the stacked layers: your program on top calls *down* through the kernel to the hardware',
-          '',
           'Same stack, two directions. Let\'s **climb it** as it boots, then **come back down** as it runs.',
         ].join('\n'),
       },
@@ -79,7 +75,8 @@ export const kernel: Course = {
       id: 'firmware',
       heading: 'Firmware: the first code that runs',
       scene: 'machine-stack',
-      focus: FIRMWARE,
+      highlight: FIRMWARE,
+      focus: [],
       slide: {
         title: 'Firmware: the first code that runs',
         body: [
@@ -109,7 +106,8 @@ export const kernel: Course = {
       id: 'bootloader',
       heading: 'The bootloader: GRUB',
       scene: 'machine-stack',
-      focus: BOOTLOADER,
+      highlight: BOOTLOADER,
+      focus: [],
       slide: {
         title: 'The bootloader: GRUB',
         body: [
@@ -140,7 +138,8 @@ export const kernel: Course = {
       id: 'kernel-boot',
       heading: 'The kernel wakes up',
       scene: 'machine-stack',
-      focus: KERNEL_BOOT,
+      highlight: KERNEL_BOOT,
+      focus: [],
       slide: {
         title: 'The kernel wakes up',
         body: [
@@ -171,7 +170,8 @@ export const kernel: Course = {
       id: 'init-systemd',
       heading: 'init: PID 1 & systemd',
       scene: 'machine-stack',
-      focus: INIT,
+      highlight: INIT,
+      focus: [],
       slide: {
         title: 'init: PID 1 & systemd',
         body: [
@@ -202,7 +202,8 @@ export const kernel: Course = {
       id: 'userspace-distros',
       heading: 'Userspace, the shell & the distro',
       scene: 'machine-stack',
-      focus: USERSPACE,
+      highlight: USERSPACE,
+      focus: [],
       slide: {
         title: 'Userspace, the shell & the distro',
         body: [
