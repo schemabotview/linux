@@ -16,7 +16,7 @@ knowledge a working engineer actually needs, not padding.
 
 | # | id | Title | Stage | Scenes | Sections |
 |---|----|-------|-------|:------:|:--------:|
-| 1 | `kernel` | Boot & the kernel | Boot | 2 | ~10 |
+| 1 | `kernel` | Boot & the kernel | Boot | 1 | ~10 |
 | 2 | `shell` | The shell & command line | Drive | 3 | ~10 |
 | 3 | `filesystem` | The filesystem & permissions | Navigate | 5 | ~10 |
 | 4 | `processes` | Processes & signals | Run | 3 | ~10 |
@@ -44,10 +44,19 @@ font, so a full canvas reads far larger than a shared band). Linux leans heavily
 (real terminal sessions) — the same reason python's syntax/data/stdlib courses each spawned a scene
 per topic.
 
-### 1. `kernel` — Boot & the kernel (2 scenes) — HYBRID, mirrors python `setup`
-- **`boot-chain`** (flow spine): `firmware (BIOS/UEFI) → bootloader (GRUB) → kernel (initramfs, mounts root) → init (PID 1 / systemd) → userspace (login, services)`. The top-to-bottom spine toured band by band (§1–§3, §8–§10). Beneath it, the **kernel-userspace boundary** band (ring 0/3, syscalls).
-- **`kernel-internals`** (detour, like `pvm-internals`): the kernel's four subsystems — **process scheduler**, **memory (virtual memory / paging)**, **VFS / filesystems**, **network stack** — around the **syscall interface**, with **device drivers** below reaching hardware. §4–§7.
-- Teaches: what "an OS" is, the boot sequence, PID 1, the syscall boundary, kernel vs distro, monolithic-with-modules. Bookends (§1/§10) frame the whole boot chain.
+### 1. `kernel` — Boot & the kernel (1 scene) — FUSED two-pass tour
+- **`machine-stack`** (one scene, two readings): a **boot ribbon** (`1 firmware → 6 shell`) ascends
+  the left beside a **layer cake** (user space · ring 3 → syscall door → kernel · ring 0 → drivers →
+  hardware). The course tours it in two passes: **§1–§6 climb the ribbon** (the machine is *built*
+  bottom-up — firmware, GRUB, kernel, mount root, init/PID 1/systemd, the shell + distro); **§7–§9
+  descend the layers** (the machine is *used* top-down — ring 3/ring 0, the syscall door, the four
+  subsystems, drivers → metal); **§10** frames the whole stack both ways.
+- Teaches: what "an OS" is, the boot sequence, PID 1, the syscall boundary, the four subsystems,
+  kernel vs distro, monolithic-with-modules. Design note: this fuses the original `boot-chain` +
+  `kernel-internals` scenes onto one diagram because they were the *same stack* seen two ways (a
+  timeline and a privilege stack) — which also fixes the userspace-top-vs-bottom inversion the split
+  created. Boot climbs; runtime descends; userspace is both the last thing built and the least
+  privileged, so it sits at the top in both readings.
 
 ### 2. `shell` — The shell & command line (3 scenes)
 - **`shell-pipeline`** (flow): the shell's own eval loop — `read line → split into words → expand (globs, $vars, $(subst)) → find command on PATH → fork+exec → wait → $?`. This *is* a flow, so it earns edges.
