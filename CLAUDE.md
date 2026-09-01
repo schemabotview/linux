@@ -5,8 +5,13 @@ live in the workspace [`CLAUDE.md`](../CLAUDE.md) — read that first; this file
 
 ## Status
 
-**BUILT — all 8 courses.** 80 sections · 80 scenes · 80 wavs (146.6 min). `npm run build`,
-`tsc --noEmit` and `npm run check` are clean. Not yet recorded, not yet published.
+**BUILT + PUBLISHED — all 8 courses.** 80 sections · 80 scenes · 80 wavs (146.6 min). `npm run build`,
+`tsc --noEmit` and `npm run check` are clean.
+
+Live at **https://graphl.in/linux/** since 2026-09-01 (Pages build source = the `deploy.yml`
+workflow; the apex domain is inherited from `schemabotview.github.io`'s CNAME, so no CNAME here).
+Listed in the catalog's `concepts.json`. This repo previously held the beat-based *graphl-studio*
+Linux app — it was replaced by this one; the old app is in git history.
 
 | # | id | Title | Sections | Audio |
 |--:|----|-------|---------:|------:|
@@ -62,6 +67,19 @@ public/audio/<course>/<section-id>.wav    narration, one clip per section (no be
   scene, and **a section with no narration wav**. The fifth is this repo's addition; the other four
   came with the engine. All five fail visually and none of them fail the build.
 - Adding a scene: define in `src/scenes/<course>/`, register in that folder's `index.ts`.
+
+## Recording
+
+- One course: `node scripts/record-course.mjs <course>` → `scripts/out/<course>.mp4` (3840×2160).
+  It spawns its own dev server unless `APP_URL` points at a running one.
+- All eight: `caffeinate -dimsu bash scripts/record-all.sh`. One dedicated Vite server on
+  `RECORD_PORT` (default **5183**, `--strictPort` so it can't drift onto a neighbour's port) is
+  shared by all eight runs; a failing course doesn't stop the batch, and the summary lists each.
+- **Budget ≈ 3× realtime** at the default `libx264 crf18 preset slow` — 146.6 min of narration is
+  roughly **7–8 h** of wall clock, i.e. an overnight job. `caffeinate -dimsu` is not optional: a
+  display sleep mid-run stalls the headless screencast.
+- Runs are **resumable** — each segment is fingerprinted on (audio bytes, geometry, fps, encode
+  settings, sting), so re-running after a failure re-records only what changed.
 - Adding content: add a `Section` under `src/content/<course>/`, list it in that folder's `index.ts`.
 
 ## Authoring notes specific to this concept
