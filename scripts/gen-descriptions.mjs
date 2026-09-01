@@ -1,26 +1,23 @@
 // gen-descriptions.mjs — write a YouTube description .txt per course.
 //
 //   node scripts/gen-descriptions.mjs            # all courses
-//   node scripts/gen-descriptions.mjs setup      # just one
+//   node scripts/gen-descriptions.mjs foundations   # just one
 //
-// Adapted from the GraphL index-site generator for this single-app repo. The reference read a
-// built public/courses.json for the concept name / series / blurbs; this app keeps all of that in
-// the typed course registry (src/content/courses/index.ts: CONCEPT, courses, BLURBS), so we
-// evaluate the registry directly via esbuild (the same bridge scripts/gen-audio-manifest.mjs uses)
-// — no build artifact required.
+// Adapted from ../../graphl-studio/aws/scripts/gen-descriptions.mjs for this SECTION-based repo. The
+// reference was beat-based and read slide titles from the live DOM (driven in ?capture=1); here one
+// SECTION = one scene + one slide + one narration wav, and every section already carries its own
+// `title` in the typed registry — so we need NO browser at all. We evaluate the real COURSES registry
+// via esbuild (the same bridge scripts/gen-audio-manifest.mjs uses) and read chapter titles straight
+// off it; chapter TIMES are ffprobe'd off each section's wav and summed with record-course.mjs's own
+// per-section timing (bell STING lead + clip + TAIL), so they line up with the concatenated MP4.
 //
 // Each description carries: a title + intro, CHAPTER timestamps (one per section, so YouTube
 // auto-chapters the video), the full course series with deep links, and hashtags. Output lands at
 // scripts/out/<course>.txt, next to the course's .mp4 / .png.
 //
-// Chapter names are the real slide titles (read from the app's DOM, driven in ?capture=1 like
-// record-course.mjs). Chapter times are ffprobe'd off each beat's wav and summed with the
-// recorder's own per-segment timing (STING lead on beat 0 + clip + TAIL), so they line up with the
-// concatenated MP4. Display titles come from scripts/titles.json (fallback: the course's title).
-//
 // Prerequisites: ffprobe on PATH; the app's audio present under public/audio/<course>/.
 
-import { execFile, spawn } from 'node:child_process'
+import { execFile } from 'node:child_process'
 import { build } from 'esbuild'
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs'
 import { promisify } from 'node:util'
@@ -29,21 +26,37 @@ import { dirname, join, resolve } from 'node:path'
 
 const run = promisify(execFile)
 const here = dirname(fileURLToPath(import.meta.url))
-const appDir = resolve(here, '..') // scripts/ lives inside the concept app
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-const readJson = (f) => { try { return JSON.parse(readFileSync(f, 'utf8')) } catch { return null } }
+const appDir = resolve(here, '..') // scripts/ lives inside the app
 
 // Match record-course.mjs's timing so chapter marks align with the concatenated video.
 const STING_MS = process.env.NO_STING ? 0 : process.env.STING_MS ? +process.env.STING_MS : 2800
-const TAIL_MS = process.env.TAIL_MS ? +process.env.TAIL_MS : 400
+const TAIL_MS = process.env.TAIL_MS ? +process.env.TAIL_MS : 500
 const CIRCLED = ['①', '②', '③', '④', '⑤', '⑥', '⑦', '⑧', '⑨', '⑩', '⑪', '⑫']
 
-// The concept's URL slug (the site path + deep links) and its hashtags. Single-app, so these are
-// constants (the reference keyed them by concept); override the slug with CONCEPT_SLUG if the
-// deploy path differs from `sql`.
-const CONCEPT_SLUG = process.env.CONCEPT_SLUG ?? 'sql'
-const HASHTAGS = '#Python #LearnPython #PythonProgramming #Coding #Programming #ComputerScience #SoftwareEngineering'
-const SITE = 'https://graphl.in'
+// The concept + where the app deploys (the catalog path + deep links). Overridable for a different
+// host: SITE default graphl.in, APP_PATH default the vite build base (/linux). Deep link is
+// `${SITE}${APP_PATH}/#/<course>` (hash routing, see src/App.tsx).
+const CONCEPT = process.env.CONCEPT ?? 'Linux'
+const SITE = process.env.SITE ?? 'https://graphl.in'
+const APP_PATH = (process.env.APP_PATH ?? '/linux').replace(/\/$/, '')
+const HASHTAGS =
+  '#Linux #LinuxTutorial #Bash #Shell #SysAdmin #DevOps #CommandLine #LearnLinux #TechEducation'
+
+// Curated PUBLISH titles (scripts/titles.json), keyed by course id — the search-facing name a course
+// carries on YouTube ("Linux Command Line"), deliberately distinct from the registry's narrative
+// in-app title ("Data Ingestion"). Used for this video's headline AND every series entry, so the
+// description names courses the same way the thumbnails and video titles do. Absent file → registry.
+const PUBLISH_TITLES = (() => {
+  const f = join(here, 'titles.json')
+  if (!existsSync(f)) return {}
+  try {
+    const { _comment, ...titles } = JSON.parse(readFileSync(f, 'utf8'))
+    return titles
+  } catch {
+    return {}
+  }
+})()
+const publishTitle = (course) => PUBLISH_TITLES[course.id] ?? course.title
 
 const titleCase = (slug) => slug.split(/[-_]/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 // m:ss (or h:mm:ss past an hour) — YouTube chapter format; first chapter must be 0:00.
@@ -58,59 +71,48 @@ async function ffprobeDuration(file) {
   return parseFloat(stdout.trim())
 }
 
-// Evaluate the typed course registry (CONCEPT, courses, BLURBS). esbuild strips the type-only
-// reveal-engine import, so the registry has no runtime deps — we import the bundle from memory.
+// Evaluate the typed COURSES registry. The content files import ONLY `../types` (`import type` →
+// erased), so the bundle has zero runtime deps and imports cleanly from memory.
 async function loadRegistry() {
   const result = await build({
-    entryPoints: [resolve(appDir, 'src/content/courses/index.ts')],
-    bundle: true, format: 'esm', platform: 'node', write: false, external: ['reveal-engine'],
+    entryPoints: [resolve(appDir, 'src/content/index.ts')],
+    bundle: true, format: 'esm', platform: 'node', write: false,
   })
   const code = result.outputFiles[0].text
   return import('data:text/javascript;base64,' + Buffer.from(code).toString('base64'))
 }
 
-async function startDevServer(conceptDir) {
-  console.log(`Starting dev server: ${conceptDir} …`)
-  const child = spawn('npm', ['run', 'dev'], { cwd: conceptDir, env: process.env })
-  const url = await new Promise((res, rej) => {
-    const to = setTimeout(() => rej(new Error('dev server did not print a URL within 60s')), 60000)
-    const onData = (buf) => {
-      const m = String(buf).match(/https?:\/\/localhost:\d+\/?/)
-      if (m) { clearTimeout(to); child.stdout.off('data', onData); res(m[0].replace(/\/?$/, '/')) }
-    }
-    child.stdout.on('data', onData)
-    child.stderr.on('data', (b) => process.env.DEBUG && process.stderr.write(b))
-    child.on('exit', (code) => rej(new Error(`dev server exited early (code ${code})`)))
-  })
-  for (let i = 0; i < 40; i++) {
-    try { if ((await fetch(url)).ok) break } catch { /* not up yet */ }
-    await sleep(250)
-  }
-  console.log(`  dev server at ${url}`)
-  return { child, url }
-}
-
-// Build the description text for one course. Blocks are separated by a VISIBLE rule (not blank
-// lines) so grouping survives even if YouTube trims empty lines on paste; chapters stay one-per-line
+// Build the description text for one course. Blocks are separated by a VISIBLE rule (not blank lines)
+// so grouping survives even if YouTube trims empty lines on paste; chapters stay one-per-line
 // (required for auto-chapters) and each series entry is a single line ending in its URL (clickable).
 const RULE = '━━━━━━━━━━━━━━━━'
-function compose({ conceptName, course, displayOf, blurbOf, chapters, series }) {
+function compose({ course, chapters, series }) {
   const L = []
-  L.push(`${displayOf(course)} · ${conceptName}`)
+  // Headline: "<title> · <concept>", but drop the suffix when the publish title already leads with the
+  // concept ("Linux Command Line · Linux" stammers; the publish title is the whole name).
+  const headline = publishTitle(course)
+  L.push(headline.toLowerCase().startsWith(CONCEPT.toLowerCase()) ? headline : `${headline} · ${CONCEPT}`)
   L.push(RULE)
-  const blurb = (blurbOf(course) || '').trim().replace(/\.$/, '') // strip a trailing period so we don't double it
-  L.push(`${blurb ? blurb + '. ' : ''}Part of GraphL's ${conceptName} series — the left-pane diagram assembles beat-by-beat, in sync with the narration.`)
+  // NB: this used to claim "the diagram assembles top-to-bottom as the narration walks through each
+  // idea" — boilerplate inherited from the graphl-studio reveal-engine, where a camera really did
+  // build a scene up beat by beat. THIS engine draws each scene SOLID (see record-course.mjs: "no
+  // reveal fold, no seek/transition/pan machinery"), so nothing assembles and the sentence described
+  // a video that does not exist. Same wrong line is still in the other concept repos' copies.
+  L.push(
+    `Part of GraphL's ${CONCEPT} series — every section pairs one diagram with the idea it explains, ` +
+    `so the picture and the words land together.`,
+  )
   L.push(RULE)
   L.push('⏱ CHAPTERS')
   for (const c of chapters) L.push(`${stamp(c.start)} ${c.title}`)
   L.push(RULE)
-  L.push(`▶ ${conceptName.toUpperCase()} — THE SERIES`)
+  L.push(`▶ ${CONCEPT.toUpperCase()} — THE SERIES`)
   series.forEach((s, i) => {
-    const label = s.id === course ? `${displayOf(s.id)}  ◀ this video` : displayOf(s.id)
-    L.push(`${CIRCLED[i] ?? '•'} ${label} → ${SITE}/${CONCEPT_SLUG}/#/${s.id}`)
+    const label = s.id === course.id ? `${publishTitle(s)}  ◀ this video` : publishTitle(s)
+    L.push(`${CIRCLED[i] ?? '•'} ${label} → ${SITE}${APP_PATH}/#/${s.id}`)
   })
   L.push(RULE)
-  L.push(`🔗 Watch interactively on GraphL → ${SITE}/${CONCEPT_SLUG}/#/${course}`)
+  L.push(`🔗 Watch interactively on GraphL → ${SITE}${APP_PATH}/#/${course.id}`)
   L.push(`🌐 More concepts → ${SITE}`)
   L.push(RULE)
   L.push(HASHTAGS)
@@ -121,58 +123,35 @@ async function main() {
   const [oneCourse] = process.argv.slice(2)
 
   const reg = await loadRegistry()
-  const conceptName = reg.CONCEPT ?? titleCase(CONCEPT_SLUG)
-  const series = reg.courses.map((c) => ({ id: c.id, title: c.title })) // catalog order
-  const blurbs = reg.BLURBS ?? {}
-  const titles = readJson(join(here, 'titles.json')) ?? {}
-  const displayOf = (id) => titles[id] ?? series.find((c) => c.id === id)?.title ?? titleCase(id)
-  const blurbOf = (id) => blurbs[id] ?? ''
+  const series = Object.values(reg.COURSES) // catalog order (registry insertion order)
+  const targets = oneCourse ? series.filter((c) => c.id === oneCourse) : series
+  if (!targets.length) {
+    console.error(`✗ no such course "${oneCourse}" (have: ${series.map((c) => c.id).join(', ')})`)
+    process.exit(1)
+  }
 
-  const targets = oneCourse ? [oneCourse] : series.map((c) => c.id)
   const outDir = join(here, 'out')
   mkdirSync(outDir, { recursive: true })
 
-  let server = null
-  const base = process.env.APP_URL ? process.env.APP_URL.replace(/\/?$/, '/') : null
-  const appBase = base ?? (server = await startDevServer(appDir), server.url)
-
-  const puppeteer = (await import('puppeteer')).default
-  let browser
-  try {
-    browser = await puppeteer.launch({ headless: true, args: ['--autoplay-policy=no-user-gesture-required'] })
-    const page = await browser.newPage()
-
-    for (const course of targets) {
-      await page.goto(`${appBase}?capture=1#/${course}`, { waitUntil: 'networkidle2' })
-      await page.waitForFunction(() => !!window.__capture, { timeout: 20000 })
-      const plan = await page.evaluate(() => window.__capture.plan())
-      if (!plan?.length) { console.warn(`  ✗ ${course}: no sections (bad id?) — skipped`); continue }
-
-      const audioDir = join(appDir, 'public', 'audio', course)
-      const chapters = []
-      let t = 0
-      for (const sec of plan) {
-        // Chapter starts at this section's beat-0 (the bell lead) — read its slide title from the DOM.
-        await page.evaluate((s) => { window.__captureReady = false; window.__capture.seek(s, 0) }, sec.section)
-        await page.waitForFunction(() => window.__captureReady === true, { timeout: 20000 }).catch(() => {})
-        await sleep(120)
-        const title = await page.$eval('.slide__title', (el) => el.textContent.trim()).catch(() => titleCase(sec.id))
-        chapters.push({ start: t, title })
-        for (let b = 0; b < sec.beats; b++) {
-          const wav = join(audioDir, `${sec.id}-${b}.wav`)
-          const dur = existsSync(wav) ? await ffprobeDuration(wav) : 3
-          t += (b === 0 ? STING_MS / 1000 : 0) + dur + TAIL_MS / 1000
-        }
-      }
-
-      const text = compose({ conceptName, course, displayOf, blurbOf, chapters, series })
-      const out = join(outDir, `${course}.txt`)
-      writeFileSync(out, text)
-      console.log(`✅ ${out}   (${chapters.length} chapters, ${stamp(t)} total)`)
+  for (const course of targets) {
+    const audioDir = join(appDir, 'public', 'audio', course.id)
+    const chapters = []
+    let t = 0
+    let missing = 0
+    for (const section of course.sections) {
+      // Chapter starts at this section's bell lead-in (its first frame) — record-course.mjs holds the
+      // opening frame for STING_MS under the bell, then the narration clip, then a TAIL.
+      chapters.push({ start: t, title: section.title || titleCase(section.id) })
+      const wav = join(audioDir, `${section.id}.wav`)
+      const dur = existsSync(wav) ? await ffprobeDuration(wav) : (missing++, 3)
+      t += STING_MS / 1000 + dur + TAIL_MS / 1000
     }
-  } finally {
-    if (browser) await browser.close()
-    if (server) server.child.kill('SIGTERM')
+
+    const text = compose({ course, chapters, series })
+    const out = join(outDir, `${course.id}.txt`)
+    writeFileSync(out, text)
+    const warn = missing ? `  ⚠ ${missing} section(s) had no wav (3s fallback)` : ''
+    console.log(`✅ ${out}   (${chapters.length} chapters, ${stamp(t)} total)${warn}`)
   }
 }
 

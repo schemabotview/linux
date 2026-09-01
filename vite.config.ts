@@ -1,26 +1,21 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { fileURLToPath } from 'node:url'
 
-// Consume the sibling reveal-engine straight from SOURCE via an alias — live HMR against the
-// engine while we co-develop, no build/publish/dist needed. Importing `reveal-engine` (the src
-// entry) pulls in the engine's own CSS + self-hosted Plex fonts, so no separate styles.css or
-// @fontsource imports are needed here. `reveal-engine/pure` is the DOM-free core (types +
-// validateCourse). `fs.allow: ['..']` lets the dev server read the sibling engine source.
-const engineSrc = fileURLToPath(new URL('../reveal-engine/src/index.ts', import.meta.url))
-const enginePure = fileURLToPath(new URL('../reveal-engine/src/pure/index.ts', import.meta.url))
-
-// `base` is the GitHub Pages project subpath in production (served at graphl.in/linux/); dev stays
-// at root. import.meta.env.BASE_URL reflects this, so per-course audio resolves correctly in both
-// (see App.tsx audioBase).
+// The render-engine lives in src/render-engine (a folder, not a package) for the MVP, so no alias
+// is needed yet. `dedupe` is kept anyway: it guarantees a single copy of react / react-dom /
+// @xyflow/react even once the engine is extracted to its own package and consumed via alias — the
+// gotcha that bites when two React copies meet (invalid-hook-call). jsx is automatic by default
+// with @vitejs/plugin-react.
+//
+// `base` is `/linux/` for the production BUILD only (the app deploys under
+// graphl.in/linux/ as a concept app in the GraphL catalog, so built asset URLs must be
+// subpath-relative). Dev/serve stays at `/` so `npm run dev` and the capture/record scripts (which
+// drive the dev server at localhost:5173/#/<id>) are unaffected.
 export default defineConfig(({ command }) => ({
   base: command === 'build' ? '/linux/' : '/',
-  resolve: {
-    alias: [
-      { find: /^reveal-engine\/pure$/, replacement: enginePure },
-      { find: /^reveal-engine$/, replacement: engineSrc },
-    ],
-  },
-  server: { fs: { allow: ['..'] } },
   plugins: [react()],
+  resolve: {
+    dedupe: ['react', 'react-dom', '@xyflow/react'],
+  },
+  server: { port: 5173 },
 }))

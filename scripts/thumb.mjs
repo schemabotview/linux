@@ -1,22 +1,22 @@
 // thumb.mjs — a crisp, branded YouTube thumbnail for a course.
 //
-//   node scripts/thumb.mjs <course> [--section N] [--beat N]
+//   node scripts/thumb.mjs <course> [--section N]
 //                          [--title T] [--kicker K] [--number NN] [--panel css] [--out file] [--full4k] [--at ms]
-//   node scripts/thumb.mjs setup
 //
-// Adapted from the GraphL index-site thumbnailer for this single-app repo (<course> only). The
-// reference read a built public/courses.json for the concept + title; this app keeps them in the
-// typed registry (CONCEPT, courses) + scripts/titles.json, evaluated via esbuild.
+// Adapted from ../../graphl-studio/aws/scripts/thumb.mjs for this SECTION-based repo. The reference
+// was beat-based (--section/--beat, driven off window.__capture); here one SECTION = one scene, so it
+// navigates the app's hash to a section's slug (like record-course.mjs) and there is no --beat. It
+// reads the course layout from window.__scene.plan() (see src/App.tsx) to pick which section's scene
+// to shoot (default: the first).
 //
-// The thumbnail is a TEMPLATE (thumb-template.html): LEFT = the course scene as it renders (a
-// lossless screenshot of the scene pane — no slide pane), RIGHT = an HTML/CSS panel driven by the
-// concept + course (kicker = concept, title = course title) with the GraphL wordmark (+ an optional
-// logo mark if one is present).
+// The thumbnail is a TEMPLATE (thumb-template.html): LEFT = the course scene as it renders (a lossless
+// screenshot of the .scene-area — no slide), RIGHT = an HTML/CSS panel driven by the concept + course
+// (kicker = concept, title = course title) with the GraphL wordmark (+ an optional logo mark).
 //
 // It's composited in the app's OWN page so the panel inherits the app's self-hosted Plex fonts (no
-// CDN, crisp text — never ffmpeg drawtext). Like record-course.mjs it drives the app in ?capture=1
-// off window.__capture (plan → seek → __captureReady), spawns the app's `npm run dev` unless
-// APP_URL reuses a server, supersamples to SCALE× (4K), then downscales to 1280×720 (Lanczos).
+// CDN, crisp text — never ffmpeg drawtext). Like record-course.mjs it drives the app in ?capture=1,
+// spawns the app's `npm run dev` unless APP_URL reuses a server, supersamples to SCALE× (4K), then
+// downscales to 1280×720 (Lanczos).
 //
 // Prerequisites: ffmpeg on PATH (Homebrew preferred, as with record-course.mjs).
 
@@ -30,12 +30,11 @@ import { dirname, join, resolve, isAbsolute } from 'node:path'
 
 const run = promisify(execFile)
 const here = dirname(fileURLToPath(import.meta.url))
-const appDir = resolve(here, '..') // scripts/ lives inside the concept app
+const appDir = resolve(here, '..') // scripts/ lives inside the app
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-const readJson = (f) => { try { return JSON.parse(readFileSync(f, 'utf8')) } catch { return null } }
 
-// Same supersampling as record-course.mjs: render the 1920×1080 stage at SCALE× device pixels so
-// text re-rasterizes crisp, then downscale. SCALE=2 → a 3840×2160 master → 1280×720 thumbnail.
+// Same supersampling as record-course.mjs: render the 1920×1080 stage at SCALE× device pixels so text
+// re-rasterizes crisp, then downscale. SCALE=2 → a 3840×2160 master → 1280×720 thumbnail.
 const W = 1920
 const H = 1080
 const SCALE = process.env.SCALE ? +process.env.SCALE : 2
@@ -49,8 +48,8 @@ const FFMPEG =
   'ffmpeg'
 
 const TEMPLATE = join(here, 'thumb-template.html')
-// Optional GraphL mark for the panel foot. Drop an SVG at any of these paths to show it; otherwise
-// the foot renders the "GraphL" wordmark alone. Override with LOGO_SVG=/path.
+// Optional GraphL mark for the panel foot. Drop an SVG at any of these paths to show it; otherwise the
+// foot renders the "GraphL" wordmark alone. Override with LOGO_SVG=/path.
 const LOGO_CANDIDATES = [
   process.env.LOGO_SVG,
   join(here, 'logo.svg'),
@@ -58,21 +57,25 @@ const LOGO_CANDIDATES = [
 ].filter(Boolean)
 const LOGO_SVG = LOGO_CANDIDATES.find(existsSync) ?? null
 
-// The right-side panel gradient (brand block). Single default for this concept; override per-thumb
-// with --panel. Blue reads well against the Zed-slate scene on the left.
-const DEFAULT_PANEL_BG = 'radial-gradient(118% 104% at 70% 34%, #5b8cff 0%, #2f4a94 46%, #16203f 100%)'
+// The concept shown as the panel kicker.
+const CONCEPT = process.env.CONCEPT ?? 'Linux'
+// The right-side panel gradient (brand block), anchored on Linux gold --brand #f2b632 (src/index.css)
+// — the same accent as the LINUX eyebrow, the slide titles and every `service` node, so the panel
+// and the scene beside it are one palette. Reads well against the Zed-slate scene; override with --panel.
+// Deliberately YELLOW-gold rather than aws/spark/databricks' orange-red, so the concepts stay apart
+// at thumbnail size where hue is all that survives.
+const DEFAULT_PANEL_BG = 'radial-gradient(118% 104% at 70% 34%, #f2b632 0%, #c07f10 44%, #3a2504 100%)'
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-// A slug → display fallback ("data-structures" → "Data Structures") when the registry lacks it.
+// A slug → display fallback ("data-engineering" → "Data Engineering") when the registry lacks it.
 const titleCase = (slug) => slug.split(/[-_]/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
 
 // ---- CLI --------------------------------------------------------------------------------
 function parse(argv) {
   const pos = []
-  const opt = { section: 0, beat: 0, at: 1200, out: null, full4k: false, title: null, kicker: null, number: null, panel: null }
+  const opt = { section: 0, at: 900, out: null, full4k: false, title: null, kicker: null, number: null, panel: null }
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i]
     if (a === '--section') opt.section = +argv[++i]
-    else if (a === '--beat') opt.beat = +argv[++i]
     else if (a === '--at') opt.at = +argv[++i]
     else if (a === '--out') opt.out = argv[++i]
     else if (a === '--title') opt.title = argv[++i]
@@ -85,7 +88,7 @@ function parse(argv) {
   return { pos, opt }
 }
 
-// ---- the concept app dev server (same handshake as record-course.mjs) --------------------
+// ---- the app dev server (same handshake as record-course.mjs) ---------------------------
 async function startDevServer(conceptDir) {
   console.log(`Starting dev server: ${conceptDir} …`)
   const child = spawn('npm', ['run', 'dev'], { cwd: conceptDir, env: process.env })
@@ -107,21 +110,34 @@ async function startDevServer(conceptDir) {
   return { child, url }
 }
 
-// concept + course title from the typed registry (CONCEPT, courses) + scripts/titles.json override,
-// so the panel copy matches what ships. esbuild strips the type-only reveal-engine import.
-async function courseMeta(course) {
+// Curated PUBLISH titles (scripts/titles.json), keyed by course id — the header a thumbnail wears on
+// YouTube ("SQL Queries"), which is search-facing and so deliberately differs from the
+// registry's narrative in-app title ("Data Ingestion"). Optional: absent file → registry title.
+const PUBLISH_TITLES = (() => {
+  const f = join(here, 'titles.json')
+  if (!existsSync(f)) return {}
+  try {
+    const { _comment, ...titles } = JSON.parse(readFileSync(f, 'utf8'))
+    return titles
+  } catch {
+    return {}
+  }
+})()
+
+// course title: titles.json override first, else the typed COURSES registry, so the panel copy matches
+// what ships. The content files import ONLY `../types` (erased) → the bundle has no runtime deps.
+async function courseTitle(course) {
+  if (PUBLISH_TITLES[course]) return PUBLISH_TITLES[course]
   try {
     const result = await build({
-      entryPoints: [resolve(appDir, 'src/content/courses/index.ts')],
-      bundle: true, format: 'esm', platform: 'node', write: false, external: ['reveal-engine'],
+      entryPoints: [resolve(appDir, 'src/content/index.ts')],
+      bundle: true, format: 'esm', platform: 'node', write: false,
     })
     const code = result.outputFiles[0].text
     const reg = await import('data:text/javascript;base64,' + Buffer.from(code).toString('base64'))
-    const titles = readJson(join(here, 'titles.json')) ?? {}
-    const c = reg.courses?.find((x) => x.id === course)
-    return { concept: reg.CONCEPT ?? null, title: titles[course] ?? c?.title ?? null }
+    return reg.COURSES?.[course]?.title ?? null
   } catch {
-    return { concept: null, title: null }
+    return null
   }
 }
 
@@ -148,34 +164,31 @@ async function makeThumb(course, opt) {
       args: [`--window-size=${CW},${CH}`, '--autoplay-policy=no-user-gesture-required'],
     })
     const page = await browser.newPage()
-    await page.goto(`${appBase}?capture=1#/${course}`, { waitUntil: 'networkidle2' })
 
-    // Validate section/beat against the app's own layout (same source record-course.mjs uses).
-    await page.waitForFunction(() => !!window.__capture, { timeout: 20000 })
-    const plan = await page.evaluate(() => window.__capture.plan())
+    // Read the course layout (list of sections + their slugs) from the app's own capture contract.
+    await page.goto(`${appBase}?capture=1#/${course}`, { waitUntil: 'networkidle2' })
+    await page.waitForFunction(() => !!window.__scene, { timeout: 20000 })
+    const plan = await page.evaluate(() => window.__scene.plan())
     if (!plan?.length) throw new Error(`course "${course}" has no sections (bad id?)`)
     const sec = plan[opt.section]
     if (!sec) throw new Error(`section ${opt.section} out of range (course has ${plan.length})`)
-    if (opt.beat < 0 || opt.beat >= sec.beats)
-      throw new Error(`beat ${opt.beat} out of range for §${opt.section} ${sec.id} (${sec.beats} beats)`)
 
-    // Position off the pure fold → wait for the painted, already-framed frame → let it settle.
-    await page.evaluate(({ s, b }) => { window.__captureReady = false; window.__capture.seek(s, b) },
-      { s: opt.section, b: opt.beat })
-    await page.waitForFunction(() => window.__captureReady === true, { timeout: 20000 }).catch(() => {})
-    await page.waitForSelector('.scene-node, .react-flow', { timeout: 15000 }).catch(() => {})
-    await sleep(opt.at)
+    // Navigate to the chosen section's slug and wait for the painted, fitView-settled scene (a fresh
+    // goto forces a clean react-flow remount — no stale prior scene in the frame), same as the recorder.
+    await page.goto(`${appBase}?capture=1#/${sec.slug}`, { waitUntil: 'networkidle2' })
+    await page.waitForSelector('.react-flow__node', { timeout: 15000 })
+    await page.evaluate(async () => { if (document.fonts?.ready) await document.fonts.ready })
+    await sleep(opt.at) // fitView + ResizeObserver re-fit + edge-pulse settle
 
-    // LEFT — screenshot just the scene pane (no slide pane) → data URI for the template.
-    const scenePane = await page.$('.rp-scene-pane')
-    if (!scenePane) throw new Error('.rp-scene-pane not found (engine markup changed?)')
+    // LEFT — screenshot just the scene area (no slide) → data URI for the template.
+    const scenePane = await page.$('.scene-area')
+    if (!scenePane) throw new Error('.scene-area not found (SectionView markup changed?)')
     const sceneB64 = await scenePane.screenshot({ encoding: 'base64' })
     const sceneUri = `data:image/png;base64,${sceneB64}`
 
     // Panel copy: kicker = concept, title = course title (registry/titles.json → flags override → slug).
-    const meta = await courseMeta(course)
-    const kicker = opt.kicker ?? meta.concept ?? titleCase(course)
-    const title = opt.title ?? meta.title ?? titleCase(course)
+    const title = opt.title ?? (await courseTitle(course)) ?? titleCase(course)
+    const kicker = opt.kicker ?? CONCEPT
     const numberHtml = opt.number ? `<div class="thumb__number">${esc(opt.number)}</div>` : ''
     // Logo is optional: show the mark if one is present, else just the wordmark.
     const logoSvg = LOGO_SVG ? readFileSync(LOGO_SVG, 'utf8').replace('<svg ', '<svg class="thumb__logo" ') : ''
@@ -214,7 +227,7 @@ async function makeThumb(course, opt) {
 const { pos, opt } = parse(process.argv.slice(2))
 const [course] = pos
 if (!course) {
-  console.error('usage: node scripts/thumb.mjs <course> [--section N] [--beat N] [--title T] [--kicker K] [--number NN] [--panel css-gradient] [--out file] [--full4k] [--at ms]')
+  console.error('usage: node scripts/thumb.mjs <course> [--section N] [--title T] [--kicker K] [--number NN] [--panel css-gradient] [--out file] [--full4k] [--at ms]')
   process.exit(2)
 }
 makeThumb(course, opt).catch((e) => {

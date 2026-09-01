@@ -1,69 +1,53 @@
-# linux
+# linux — GraphL concept repo
 
-The **Linux** concept app for GraphL — a self-contained Vite/React app that renders the Linux
-courses as progressive-reveal videos and serves its own narration audio. All rendering, the reveal
-fold, and the `<RevealPlayer>` come from the shared engine
-([`reveal-engine`](https://github.com/schemabotview/reveal-engine)); this repo supplies only what's
-specific to Linux: its **scenes**, its **courses**, and (later) its **audio**.
+The **Linux** concept app for [GraphL](https://graphl.in). One section = a left **scene** (react-flow
+diagram or code snippet) + a right **slide** (markdown) + a **narration** script, rendered
+responsively (4K capture · laptop web app · mobile) and captured to video.
+
+> **Status: built.** All 8 courses — **80 sections, 80 scenes, 80 narration wavs (146.6 min)**.
+> `npm run build`, `tsc --noEmit` and `npm run check` are clean. Not yet recorded or published.
+
+Workspace-wide model, pipeline, and conventions: see the workspace [`README.md`](../README.md).
+
+## The course arc (8 courses)
+
+| # | Course | What it covers |
+|--:|--------|----------------|
+| 1 | **kernel** | Boot & the kernel — firmware, GRUB, the kernel, PID 1, and the syscall boundary. |
+| 2 | **shell** | Command anatomy, PATH, expansion & quoting, exit codes, streams, redirection & pipes. |
+| 3 | **filesystem** | The FHS tree, paths & navigation, permissions & ownership, inodes & links, mounts. |
+| 4 | **processes** | fork & exec, states & the scheduler, zombies & orphans, signals, ps/top/nice/cgroups. |
+| 5 | **text** | grep & regex, sed, awk, sort/uniq/cut/wc/tr, find & xargs — the text toolkit as pipelines. |
+| 6 | **admin** | Users & sudo, systemd & journalctl, packages, cron & timers, networking with ip/ss/curl/ssh. |
+| 7 | **scripting** | Shebang & variables, conditionals, loops & functions, robust bash (`set -euo pipefail`). |
+| 8 | **project** | The capstone — build & ship `sysreport`, a system-health & log-summary CLI, end to end. |
+
+Section counts: 10 · 10 · 10 · 10 · 10 · 10 · **9** · 11. Narration for every section is already
+generated (Colab + Chatterbox) and lives at `public/audio/<course>/<section-id>.wav`, so the
+`narration` field of a `Section` is **frozen** — editing it would desynchronise the audio.
 
 ## Layout
 
 ```
 src/
-  scenes/               this concept's SceneSpecs — the diagram STRUCTURE (authored with reveal-engine helpers)
-    index.ts            the scene registry: getScene(id)
-  content/courses/*.ts  the typed Courses: sections → slide (Markdown body) + focus + beats
-    index.ts            the catalog: courses[] + BLURBS
-  App.tsx               hash router (#/<course> plays · #scene/<id> previews a scene solid)
-  main.tsx              mounts <RevealPlayer course getScene audioBase=… />; dev validateCourse gate
-  index.css             page + course-index styling (the engine ships its own scene/slide/player CSS)
-public/audio/           per-beat narration clips: <courseId>/<section-id>-<beatIndex>.wav (gitignored)
-COURSE-PLAN.md          the proposed 8-course arc + per-course scene inventory + rationale
+  render-engine/   layout + react-flow / code-snippet renderer (folder, not a package)
+  scenes/          hand-authored scenes + registry
+  content/         courses → sections (one file per section) + registry
+  section/         composited scene-left / slide-right view (responsive)
+  App.tsx          hash router — section (whole-scene) view · scene (individual) view
+scripts/
+  record-course.mjs / record-reels.mjs   capture → mp4 (landscape / portrait)
+  thumb.mjs / gen-descriptions.mjs        thumbnails / video descriptions
+  colab_generate_audio.ipynb              Colab + Chatterbox TTS → .wav
 ```
 
-## How it uses reveal-engine
-
-Consumed **straight from source** via a Vite alias (see `vite.config.ts`):
-`reveal-engine` → `../reveal-engine/src`, `reveal-engine/pure` → `../reveal-engine/src/pure`. Live
-HMR against the engine while both co-develop — no build/publish step. Importing `reveal-engine`
-pulls in the engine's CSS + self-hosted Plex fonts automatically, so authoring is **one import**:
-
-```ts
-import { type SceneSpec, type Course, container, wgrid, BLUE, GREEN, RevealPlayer } from 'reveal-engine'
-```
-
-For deploy the alias is swapped for a published/git dependency (the engine repo is source-only).
-
-## The 8-course arc
-
-The real operator's workflow — **boot → drive → navigate → run → transform → administer → automate → ship**:
-
-| # | id | Title | Stage |
-|---|----|----|----|
-| 1 | `kernel` | Boot & the kernel | Boot |
-| 2 | `shell` | The shell & command line | Drive |
-| 3 | `filesystem` | The filesystem & permissions | Navigate |
-| 4 | `processes` | Processes & signals | Run |
-| 5 | `text` | Text processing & pipelines | Transform |
-| 6 | `admin` | Users, services & networking | Administer |
-| 7 | `scripting` | Shell scripting | Automate |
-| 8 | `project` | Capstone — ship a real CLI tool | Ship |
-
-See `COURSE-PLAN.md` for the scene inventory and design rationale per course.
-
-## Develop
+## Run
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173/ (Vite default; per-concept port TBD)
+npm run dev                  # open the printed URL, try #/kernel
+npm run build                # vite build (must stay clean)
+npm run check                # content budgets — cards, slides, icons, focus, missing wavs
+npm run record kernel        # 4K video → scripts/out/kernel.mp4
+npm run record:reels kernel  # portrait reels
 ```
-
-- `localhost:<port>/` — the course index
-- `localhost:<port>/#/kernel` — play a course (`←/→` page beats, SPACE toggles narration)
-- `localhost:<port>/#scene/boot-chain` — preview one scene fully solid (authoring aid)
-- `localhost:<port>/?capture#/kernel` — the fixed 1920×1080 capture stage (recorded at 2× DPR → 4K)
-
-## Status
-
-Scaffold up, plan written. Course 1 (`kernel`) authoring in progress. See `CLAUDE.md` for the
-content model, reveal model, and scene-design rules.

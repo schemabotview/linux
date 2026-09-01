@@ -1,0 +1,11 @@
+{
+  "_comment": "Curated publish titles (YouTube title + thumbnail header) per course, keyed by course id. An override for the registry's in-app narrative course.title — the in-app title is narrative ('Boot & the kernel'), this one is search-facing. Read by gen-descriptions.mjs and thumb.mjs.",
+  "kernel": "Linux Boot & Kernel",
+  "shell": "Linux Command Line",
+  "filesystem": "Linux Filesystem & Permissions",
+  "processes": "Linux Processes & Signals",
+  "text": "Linux Text Processing",
+  "admin": "Linux System Administration",
+  "scripting": "Bash Scripting",
+  "project": "Linux Project"
+}

@@ -1,20 +1,12 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { validateCourse } from 'reveal-engine'
-import { App } from './App.tsx'
-import { getScene } from './scenes/index.ts'
-import { courses } from './content/courses/index.ts'
+import '@xyflow/react/dist/style.css'
+// Self-hosted fonts → deterministic text metrics, so screenshots are identical across machines.
+import '@fontsource/ibm-plex-sans/400.css'
+import '@fontsource/ibm-plex-sans/600.css'
+import '@fontsource/ibm-plex-mono/400.css'
 import './index.css'
-
-// Fail loud at load in dev if any course's beat references a scene node id that doesn't exist.
-// tsc type-checks the scenes + courses; validateCourse (from the engine's DOM-free core) adds
-// the beat→scene id foreign-key check. (No-op while the registries are still empty.)
-if (import.meta.env.DEV) {
-  for (const c of courses) {
-    const errors = validateCourse(c.sections, getScene)
-    if (errors.length) console.error(`[content] "${c.id}" failed:\n` + errors.map((e) => '  ✗ ' + e).join('\n'))
-  }
-}
+import { App } from './App'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

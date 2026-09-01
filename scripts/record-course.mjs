@@ -1,28 +1,28 @@
-// record-course.mjs — the capture pipeline for THIS concept app: one course → one 4K MP4.
+// record-course.mjs — [STEP 3, 4K LANDSCAPE] one course → one 3840×2160 MP4 for YouTube.
 //
-//   node scripts/record-course.mjs <course> [--force] [--only <tok[,tok]>]
-//   node scripts/record-course.mjs setup
+//   node scripts/record-course.mjs <course> [--force] [--only <id[,id]>]
 //
-// Adapted from the GraphL index-site recorder for this single-app repo: the concept app IS this
-// repo (scripts/ lives inside it), so there is no <concept> dimension — just <course>. Everything
-// else is the reference pipeline verbatim.
+// Blueprint: ../../graphl-studio/aws/scripts/record-course.mjs — the concat-safe encode contract
+// (forced CFR + fixed timescale + gradfun deband + identical codec/pix/audio per segment so the
+// final `-c copy` join is glitch-free) is lifted verbatim. What's DIFFERENT here: this app is
+// SECTION-based, not beat-based — one section = one scene + one slide + one narration wav — so there
+// is no reveal fold, no seek/transition/pan machinery. Each section is just: navigate the hash to
+// its slug → wait for the painted, fitView-settled frame → hold for the clip → next.
 //
-// This is the CAPTURE half + the MERGE half in one file, because the granularity is the BEAT
-// (`1 beat = 1 narration line + 1 reveal delta`; timing = clip length), not the section: every
-// beat is recorded as its own concat-safe segment, then the segments are concatenated (`-c copy`,
-// no re-encode) into scripts/out/<course>.mp4.
+// TRUE 4K (no fixed-stage trick): this app's layout is FLUID (react-flow fitView scales the scene
+// into its pane; the slide's useSlideScale zooms its 806px design width to the live pane), so we set
+// the puppeteer VIEWPORT directly to 3840×2160. page.screencast() records at the CSS viewport size
+// (it ignores deviceScaleFactor), so the frames are exactly 3840×2160 = 2160p, natively.
 //
-// How one beat is recorded (the locked capture contract — see reveal-engine CaptureStage.tsx):
-//   drive the app in ?capture=1 mode → window.__capture.seek(section, beat) jumps the cursor off
-//   the PURE FOLD → await window.__captureReady (the fold + instant camera fit have painted the
-//   frame) → start the Puppeteer screencast → hold exactly the clip's duration → stop → mux the
-//   clip. Never driven off the audio `ended` event: a failed clip fetch can't hang the record,
-//   because timing comes from ffprobe-ing the wav, not from playback.
+// THE BELL = the section SEPARATOR: a synthesized three-note brand bell plays as a lead-in at the
+// START of every section (the opening frame is held for STING_MS under the bell, then narration
+// begins). Bell-at-each-start → a bell between all nine sections, combined into one video.
 //
-// The recorder spawns this app's own `npm run dev` (deterministic, same-origin audio, self-hosted
-// fonts) and shuts it down when done. Set APP_URL to reuse a server you started.
+// Timing is driven by the wav length (ffprobe), never by playback: a missing clip falls back to 3s
+// silence so the pipeline yields a video rather than hanging. Audio is read straight from
+// public/audio/<course>/<id>.wav on disk (same-repo), not fetched over HTTP.
 //
-// Prerequisites: ffmpeg + ffprobe on PATH (Homebrew ffmpeg preferred — libx264 + deband).
+// Prerequisites: ffmpeg + ffprobe on PATH (Homebrew ffmpeg preferred — libx264 + gradfun deband).
 
 import { execFile, spawn } from 'node:child_process'
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs'
@@ -33,39 +33,24 @@ import { dirname, join, resolve } from 'node:path'
 
 const run = promisify(execFile)
 const here = dirname(fileURLToPath(import.meta.url))
-const appDir = resolve(here, '..') // scripts/ lives inside the concept app
+const appDir = resolve(here, '..') // scripts/ lives inside the app
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const sha = (data) => createHash('sha256').update(data).digest('hex').slice(0, 16)
 const pad2 = (n) => String(n).padStart(2, '0')
 const readJson = (f) => { try { return JSON.parse(readFileSync(f, 'utf8')) } catch { return null } }
 
-// ---- YouTube-compatible frame -----------------------------------------------------------
-// The app's stage is a fixed 1920×1080 (16:9). page.screencast() records at the CSS viewport
-// size (it ignores deviceScaleFactor), so we enlarge the VIEWPORT to W·SCALE × H·SCALE: the
-// player's useFitStage auto-scales the 1920×1080 stage to fill it, so text re-rasterizes crisp
-// at SCALE×. SCALE=2 → 3840×2160 = 4K UHD (YouTube's 2160p), still exactly 16:9.
-const W = 1920
-const H = 1080
-const SCALE = process.env.SCALE ? +process.env.SCALE : 2
-const CW = W * SCALE
-const CH = H * SCALE
+// ---- 4K landscape frame -----------------------------------------------------------------
+const CW = process.env.WIDTH ? +process.env.WIDTH : 3840
+const CH = process.env.HEIGHT ? +process.env.HEIGHT : 2160
 const FPS = process.env.FPS ? +process.env.FPS : 30
-// A brief held tail after each clip so beats breathe and audio is never clipped at the join.
-const TAIL_MS = process.env.TAIL_MS ? +process.env.TAIL_MS : 400
-// A brand "sting" — a synthesized three-note bell arpeggio (no audio asset) — plays as a LEAD-IN at
-// the START OF EACH SECTION (a "slide"): the section's opening frame is held for STING_MS with the
-// bell, then narration begins. Only a section's FIRST beat (beat 0) gets the lead. STING_MS=0 or
-// NO_STING disables it.
+// A brief held tail after each section so it breathes and audio is never clipped at the join.
+const TAIL_MS = process.env.TAIL_MS ? +process.env.TAIL_MS : 500
+// The brand bell lead-in that opens (and so separates) each section. STING_MS=0 or NO_STING disables.
 const STING_MS = process.env.NO_STING ? 0 : process.env.STING_MS ? +process.env.STING_MS : 2800
 const STING_SIG = STING_MS > 0 ? `bell-arp:v1:${STING_MS}` : 'none'
-// The per-section transition PAN runs at the engine's live fit speed (FIT_MS ≈ 550ms) by default: a
-// quick move reads smoothly, whereas a slow multi-second pan at 30fps judders (tiny per-frame motion
-// reads as stepping). It plays at the START of the bell lead; the camera then rests on the band for
-// the remainder before narration. PAN_MS must be ≤ STING_MS (it fits inside the bell window).
-const PAN_MS = process.env.PAN_MS ? +process.env.PAN_MS : 550
 
-// Prefer a Homebrew ffmpeg (libx264 + gradfun deband kills dark-gradient banding on YouTube's
-// codec); fall back to Apple hardware, then plain ffmpeg.
+// Prefer a Homebrew ffmpeg (libx264 + gradfun deband kills dark-gradient banding on YouTube's codec);
+// fall back to Apple hardware, then plain ffmpeg.
 const FFMPEG =
   process.env.FFMPEG ??
   ['/opt/homebrew/bin/ffmpeg', '/usr/local/bin/ffmpeg'].find(existsSync) ??
@@ -86,9 +71,9 @@ async function ffprobeDuration(file) {
   return parseFloat(stdout.trim())
 }
 
-// Concatenate audio inputs into one mono 44.1 kHz WAV via the concat FILTER (per-input resample):
-// the sting bed is 44.1 kHz but a narration clip may be 24 kHz, and the concat DEMUXER corrupts the
-// timeline on mismatched rates. A single-input call (n=1) passes through cleanly.
+// Concatenate audio inputs into one mono 44.1 kHz WAV via the concat FILTER (per-input resample): the
+// bell bed is 44.1 kHz but a narration clip may be another rate, and the concat DEMUXER corrupts the
+// timeline on a mismatch. The filter resamples each input first, so the join is clean.
 async function concatAudio(inputs, dst) {
   const inArgs = inputs.flatMap((f) => ['-i', f])
   const chains = inputs.map((_, i) => `[${i}:a]aresample=44100[a${i}]`).join(';')
@@ -97,8 +82,8 @@ async function concatAudio(inputs, dst) {
   await run(FFMPEG, ['-y', ...inArgs, '-filter_complex', filter, '-map', '[out]', '-ar', '44100', '-ac', '1', dst])
 }
 
-// Render the brand bell once → bell.wav, and return a helper that pads/trims it to a lead of
-// STING_MS onto `dst`. No-op (returns null) when disabled.
+// Render the brand bell once → bell.wav, and return a helper that pads/trims it to a lead of STING_MS
+// onto `dst`. No-op (returns null) when the sting is disabled.
 async function prepareBell(tmp) {
   if (STING_MS <= 0) return null
   const bell = join(tmp, 'bell.wav')
@@ -112,14 +97,13 @@ async function prepareBell(tmp) {
   return (dst) => run(FFMPEG, ['-y', '-i', bell, '-af', `apad,atrim=0:${secs}`, '-ar', '44100', '-ac', '1', dst])
 }
 
-// Mux one beat's webm + clip → MP4 with CONCAT-SAFE settings: forced CFR, a fixed video
-// timescale, gradfun deband, and identical codec/pix/audio params for every segment so the
-// final `-c copy` concat is glitch-free at the joins. `total` (clip + tail) bounds both
-// streams; apad extends the clip with silence to fill the held tail.
-async function encodeSegment(webm, clip, total, outMp4) {
+// Mux one section's webm + audio → MP4 with CONCAT-SAFE settings so the final `-c copy` concat is
+// glitch-free: forced CFR, fixed video timescale, gradfun deband, and identical codec/pix/audio params
+// for every segment. `total` (bell lead + clip + tail) bounds both streams; apad fills the tail.
+async function encodeSegment(webm, audio, total, outMp4) {
   const quality = IS_X26X ? ['-preset', PRESET, '-crf', CRF] : ['-b:v', BITRATE]
   await run(FFMPEG, [
-    '-y', '-i', webm, '-i', clip,
+    '-y', '-i', webm, '-i', audio,
     '-map', '0:v:0', '-map', '1:a:0',
     '-vf', 'gradfun=strength=0.9:radius=16',
     '-r', String(FPS), '-vsync', 'cfr', '-video_track_timescale', '90000',
@@ -130,11 +114,11 @@ async function encodeSegment(webm, clip, total, outMp4) {
   ])
 }
 
-// ---- the concept app dev server ---------------------------------------------------------
-// Spawn `npm run dev` in this app and resolve once Vite prints its Local URL.
-async function startDevServer(conceptDir) {
-  console.log(`Starting dev server: ${conceptDir} …`)
-  const child = spawn('npm', ['run', 'dev'], { cwd: conceptDir, env: process.env })
+// ---- the app dev server -----------------------------------------------------------------
+// Spawn `npm run dev` and resolve once Vite prints its Local URL. Set APP_URL to reuse a server.
+async function startDevServer() {
+  console.log(`Starting dev server: ${appDir} …`)
+  const child = spawn('npm', ['run', 'dev'], { cwd: appDir, env: process.env })
   const url = await new Promise((res, rej) => {
     const to = setTimeout(() => rej(new Error('dev server did not print a URL within 60s')), 60000)
     const onData = (buf) => {
@@ -145,7 +129,6 @@ async function startDevServer(conceptDir) {
     child.stderr.on('data', (b) => process.env.DEBUG && process.stderr.write(b))
     child.on('exit', (code) => rej(new Error(`dev server exited early (code ${code})`)))
   })
-  // Poll until it actually serves before driving it.
   for (let i = 0; i < 40; i++) {
     try { if ((await fetch(url)).ok) break } catch { /* not up yet */ }
     await sleep(250)
@@ -154,154 +137,147 @@ async function startDevServer(conceptDir) {
   return { child, url }
 }
 
-// ---- capture ----------------------------------------------------------------------------
-async function recordCourse(course, { force = false, only = [] } = {}) {
-  const conceptDir = appDir
-  if (!existsSync(conceptDir)) throw new Error(`concept app not found: ${conceptDir}`)
+// Navigate to a section and wait for its scene to be painted AND fitView-settled — the deterministic
+// frame the reproducible-layout model depends on. A fresh goto per section forces a clean react-flow
+// remount (it keys on scene id), so there is never a stale prior scene in the frame.
+async function gotoSection(page, appBase, slug) {
+  await page.goto(`${appBase}?capture=1#/${slug}`, { waitUntil: 'networkidle2' })
+  await page.waitForSelector('.react-flow__node', { timeout: 15000 })
+  await page.evaluate(async () => { if (document.fonts?.ready) await document.fonts.ready })
+  await sleep(700) // fitView (instant) + ResizeObserver re-fit + edge-pulse settle
+}
 
+// CDP screencast only emits a frame on a VISUAL CHANGE, so an otherwise-static section records an
+// EMPTY webm (0 frames) and the mux fails. A 1px, ~1%-opacity speck nudged every animation frame
+// keeps frames flowing; at 4K that sub-perceptible pixel is quantized away by x264. Removed on stop.
+async function startKeepalive(page) {
+  await page.evaluate(() => {
+    const d = document.createElement('div')
+    d.id = '__cap_keepalive'
+    d.style.cssText =
+      'position:fixed;left:0;top:0;width:1px;height:1px;background:#888;opacity:0.01;' +
+      'pointer-events:none;z-index:2147483647;will-change:transform'
+    document.body.appendChild(d)
+    let x = 0
+    const loop = () => {
+      x = (x + 3) % 30
+      d.style.transform = `translate3d(${x}px,0,0)`
+      window.__cap_raf = requestAnimationFrame(loop)
+    }
+    loop()
+  })
+}
+async function stopKeepalive(page) {
+  await page.evaluate(() => {
+    if (window.__cap_raf) cancelAnimationFrame(window.__cap_raf)
+    document.getElementById('__cap_keepalive')?.remove()
+  })
+}
+
+// ---- record -----------------------------------------------------------------------------
+async function recordCourse(course, { force = false, only = [] } = {}) {
   const tmp = join(here, '.tmp', course)
   const segDir = join(here, 'segments', course)
   const outDir = join(here, 'out')
   for (const d of [tmp, segDir, outDir]) mkdirSync(d, { recursive: true })
 
-  // Render the section-start bell once (null when the sting is disabled).
   const bellBed = await prepareBell(tmp)
 
-  // Spawn the dev server (unless APP_URL reuses an existing one).
   let server = null
   const base = process.env.APP_URL ? process.env.APP_URL.replace(/\/?$/, '/') : null
-  const appBase = base ?? (server = await startDevServer(conceptDir), server.url)
+  const appBase = base ?? (server = await startDevServer(), server.url)
 
   const puppeteer = (await import('puppeteer')).default
   let browser
-  const segments = [] // ordered list of { mp4 } to concat
+  const segments = [] // ordered { mp4 } to concat
   try {
     browser = await puppeteer.launch({
       headless: true,
       defaultViewport: { width: CW, height: CH, deviceScaleFactor: 1 },
-      args: [`--window-size=${CW},${CH}`, '--autoplay-policy=no-user-gesture-required'],
+      args: [`--window-size=${CW},${CH}`],
     })
     const page = await browser.newPage()
     await page.goto(`${appBase}?capture=1#/${course}`, { waitUntil: 'networkidle2' })
 
-    // The app lays out its own course for the recorder (section ids + beat counts).
-    await page.waitForFunction(() => !!window.__capture, { timeout: 20000 })
-    const plan = await page.evaluate(() => window.__capture.plan())
+    // The app lays out its own course for the recorder (slug + course + section id + scene per section).
+    await page.waitForFunction(() => !!window.__scene, { timeout: 20000 })
+    const plan = await page.evaluate(() => window.__scene.plan())
     if (!plan?.length) throw new Error(`course "${course}" has no sections (bad id?)`)
-    const totalBeats = plan.reduce((n, s) => n + s.beats, 0)
-    console.log(`Course ${course}: ${plan.length} sections, ${totalBeats} beats @ ${CW}×${CH}\n`)
+    console.log(`Course ${course}: ${plan.length} sections @ ${CW}×${CH}\n`)
 
-    let prevSec = null // the section recorded just before this one (for the transition pan)
+    let n = 0
     for (const sec of plan) {
-      for (let beat = 0; beat < sec.beats; beat++) {
-        const tag = `${pad2(sec.section)}-${sec.id}-b${beat}`
-        const segMp4 = join(segDir, `${tag}.mp4`)
-        const sidecar = join(segDir, `${tag}.json`)
-        const clip = join(tmp, `${tag}.wav`)
+      n++
+      const tag = `${pad2(n)}-${sec.id}`
+      // --only RESTRICTS which segments are (re)recorded; a run with it refreshes those segments and
+      // SKIPS the final merge (a partial set can't concat into a whole video). A full run merges all.
+      if (only.length && !only.some((t) => sec.id.includes(t) || tag.includes(t))) continue
+      const segMp4 = join(segDir, `${tag}.mp4`)
+      const sidecar = join(segDir, `${tag}.json`)
+      const clip = join(tmp, `${tag}.wav`)
 
-        // Clip → duration (timing source). Missing clip = a not-yet-generated beat: fall back
-        // to 3s silence so the pipeline still yields a video rather than hanging.
-        const clipUrl = `${appBase}audio/${course}/${sec.id}-${beat}.wav`
-        let dur, audioHash
-        try {
-          const buf = Buffer.from(await (await fetch(clipUrl)).arrayBuffer())
-          writeFileSync(clip, buf)
-          audioHash = sha(buf)
-          dur = await ffprobeDuration(clip)
-        } catch {
-          await run(FFMPEG, ['-y', '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono', '-t', '3', clip])
-          audioHash = 'silence3'
-          dur = 3
-          console.warn(`  §${sec.section} ${sec.id} b${beat}: no audio → 3s silence`)
-        }
-
-        // A section's first beat (beat 0) opens with the bell lead-in; other beats have none.
-        const leadMs = beat === 0 ? STING_MS : 0
-        // During that lead, animate the camera from the PREVIOUS section's band to this one — but
-        // only within a scene (a scene change shares no band to travel across) and only when there
-        // is a previous section (the first section has nowhere to pan from → static bell).
-        const canPan = leadMs > 0 && prevSec != null && prevSec.scene === sec.scene
-
-        // Incremental reuse: re-record iff missing/changed (or --force / --only match).
-        const fp = sha(JSON.stringify({
-          v: 1, audioHash, scale: SCALE, fps: FPS, tail: TAIL_MS, enc: ENCODE_SIG,
-          sting: leadMs > 0 ? STING_SIG : 'none',
-          pan: canPan ? `pan:${PAN_MS}:from:${prevSec.id}` : 'none',
-        }))
-        const selected = only.length > 0 && only.some((t) => sec.id.includes(t) || tag.includes(t))
-        const have = existsSync(segMp4) && existsSync(sidecar)
-        const record = force || selected || !have || readJson(sidecar)?.fp !== fp
-        if (!record) {
-          console.log(`  §${sec.section} ${sec.id} b${beat}  reuse`)
-          segments.push(segMp4)
-          continue
-        }
-
-        // Position → wait for the painted, already-framed frame → roll → hold. total (which bounds
-        // both streams) and the video hold include the bell lead. For a transition beat we FIRST
-        // frame the previous section's band (so frame 0 is continuous with the prior segment, even
-        // if that beat was reused this run), roll, THEN animate the fit to this section's band over
-        // the sting window — capturing the pan that a plain instant seek loses between segments.
-        const total = leadMs / 1000 + dur + TAIL_MS / 1000
-        const startAt = canPan ? { s: prevSec.section, b: prevSec.beats - 1 } : { s: sec.section, b: beat }
-        await page.evaluate(({ s, b }) => { window.__captureReady = false; window.__capture.seek(s, b) }, startAt)
-        await page.waitForFunction(() => window.__captureReady === true, { timeout: 20000 }).catch(() => {})
-        await page.waitForSelector('.scene-node, .react-flow', { timeout: 15000 }).catch(() => {})
-
-        const webm = join(tmp, `${tag}.webm`)
-        const recorder = await page.screencast({ path: webm })
-        // Keep the compositor emitting frames for the whole hold. CDP screencast only produces a
-        // frame on a VISUAL CHANGE, so an otherwise-static beat — e.g. a scene's first section,
-        // which has no transition pan to animate — records an EMPTY webm (0 frames), and the mux
-        // then fails. A 1px, ~1%-opacity speck nudged every animation frame keeps frames flowing;
-        // at 4K that single sub-perceptible pixel is quantized away by x264. Removed on stop.
-        await page.evaluate(() => {
-          const d = document.createElement('div')
-          d.id = '__cap_keepalive'
-          d.style.cssText =
-            'position:fixed;left:0;top:0;width:1px;height:1px;background:#888;opacity:0.01;' +
-            'pointer-events:none;z-index:2147483647;will-change:transform'
-          document.body.appendChild(d)
-          let x = 0
-          const loop = () => {
-            x = (x + 3) % 30
-            d.style.transform = `translate3d(${x}px,0,0)`
-            window.__cap_raf = requestAnimationFrame(loop)
-          }
-          loop()
-        })
-        if (canPan) {
-          await page.evaluate(({ s, b, ms }) => window.__capture.transition(s, b, ms),
-            { s: sec.section, b: beat, ms: PAN_MS })
-        }
-        const panNote = canPan ? ` (pan ${(PAN_MS / 1000).toFixed(2)}s)` : ''
-        const lead = leadMs > 0 ? `  ♪ sting ${(leadMs / 1000).toFixed(1)}s${panNote} +` : ''
-        console.log(`  §${sec.section} ${sec.id} b${beat}  ▶ record (${lead}${dur.toFixed(1)}s)`)
-        await sleep(Math.round(total * 1000))
-        await recorder.stop()
-        await page.evaluate(() => {
-          if (window.__cap_raf) cancelAnimationFrame(window.__cap_raf)
-          document.getElementById('__cap_keepalive')?.remove()
-        })
-
-        // Segment audio: the section-start bell lead + this beat's clip; mirrors the video hold.
-        let segAudio = clip
-        if (leadMs > 0 && bellBed) {
-          const stingWav = join(tmp, `${tag}-sting.wav`)
-          await bellBed(stingWav)
-          segAudio = join(tmp, `${tag}-audio.wav`)
-          await concatAudio([stingWav, clip], segAudio)
-        }
-        await encodeSegment(webm, segAudio, total, segMp4)
-        writeFileSync(sidecar, JSON.stringify({ fp, builtAt: new Date().toISOString() }, null, 2))
-        segments.push(segMp4)
-        console.log(`  §${sec.section} ${sec.id} b${beat}  ✓ ${tag}.mp4`)
+      // Narration wav straight off disk (same repo). Missing → 3s silence so the run never hangs.
+      const wav = resolve(appDir, 'public', 'audio', sec.course, `${sec.id}.wav`)
+      let dur, audioHash
+      if (existsSync(wav)) {
+        const buf = readFileSync(wav)
+        writeFileSync(clip, buf)
+        audioHash = sha(buf)
+        dur = await ffprobeDuration(clip)
+      } else {
+        await run(FFMPEG, ['-y', '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono', '-t', '3', clip])
+        audioHash = 'silence3'
+        dur = 3
+        console.warn(`  §${n} ${sec.id}: no audio → 3s silence`)
       }
-      prevSec = sec // the next section pans from this one's band (recorded or reused)
+
+      // Incremental reuse: re-record iff missing/changed (or --force / --only match).
+      const fp = sha(JSON.stringify({
+        v: 1, audioHash, w: CW, h: CH, fps: FPS, tail: TAIL_MS, enc: ENCODE_SIG, sting: STING_SIG,
+      }))
+      const have = existsSync(segMp4) && existsSync(sidecar)
+      if (!(force || !have || readJson(sidecar)?.fp !== fp)) {
+        console.log(`  §${n} ${sec.id}  reuse`)
+        segments.push(segMp4)
+        continue
+      }
+
+      // Position → wait for the painted, framed frame → roll → hold (bell lead + clip + tail).
+      const total = STING_MS / 1000 + dur + TAIL_MS / 1000
+      await gotoSection(page, appBase, sec.slug)
+
+      const webm = join(tmp, `${tag}.webm`)
+      const recorder = await page.screencast({ path: webm })
+      await startKeepalive(page)
+      const lead = STING_MS > 0 ? `♪ ${(STING_MS / 1000).toFixed(1)}s + ` : ''
+      console.log(`  §${n} ${sec.id}  ▶ record (${lead}${dur.toFixed(1)}s)`)
+      await sleep(Math.round(total * 1000))
+      await recorder.stop()
+      await stopKeepalive(page)
+
+      // Segment audio: bell lead + this section's clip; mirrors the video hold.
+      let segAudio = clip
+      if (STING_MS > 0 && bellBed) {
+        const stingWav = join(tmp, `${tag}-sting.wav`)
+        await bellBed(stingWav)
+        segAudio = join(tmp, `${tag}-audio.wav`)
+        await concatAudio([stingWav, clip], segAudio)
+      }
+      await encodeSegment(webm, segAudio, total, segMp4)
+      writeFileSync(sidecar, JSON.stringify({ fp, builtAt: new Date().toISOString() }, null, 2))
+      segments.push(segMp4)
+      console.log(`  §${n} ${sec.id}  ✓ ${tag}.mp4`)
     }
   } finally {
     if (browser) await browser.close()
     if (server) server.child.kill('SIGTERM')
+  }
+
+  // A --only run refreshed just a subset of segments → there is no complete set to merge. Stop here;
+  // a later full run (no --only) reuses every unchanged segment and concatenates the whole course.
+  if (only.length) {
+    console.log(`\n✔ recorded ${segments.length} segment(s) (--only) — skipping merge. Run without --only to build ${course}.mp4.`)
+    return null
   }
 
   // Merge: concat demuxer + stream copy (uniform params → clean joins, seconds).
@@ -332,7 +308,7 @@ function parse(argv) {
 const { pos, only, force } = parse(process.argv.slice(2))
 const [course] = pos
 if (!course) {
-  console.error('usage: node scripts/record-course.mjs <course> [--force] [--only <tok[,tok]>]')
+  console.error('usage: node scripts/record-course.mjs <course> [--force] [--only <id[,id]>]')
   process.exit(2)
 }
 recordCourse(course, { force, only }).catch((e) => {
