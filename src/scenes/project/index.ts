@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { capBrief } from './cap-brief'
 import { capStructure } from './cap-structure'
 import { capArguments } from './cap-arguments'

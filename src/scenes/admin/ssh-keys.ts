@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §9 ssh — the key pair is the whole idea and it is asymmetric, so the halves are drawn as two cards
 // that go to two different places. The card below is the session that puts each half where it belongs,

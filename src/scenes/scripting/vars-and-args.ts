@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §3 variables-args — assignment is whitespace-sensitive in a way nothing else in bash is, and the
 // failure is silent and bizarre (bash tries to RUN the name), so the trap gets a node of its own. The

@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §3 regex — a metacharacter is a symbol, a meaning and an example, which is a row; the table lets you
 // read down the symbol column the way you would a reference card. The card below is the payoff: three

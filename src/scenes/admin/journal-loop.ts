@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §5 systemd-logs — the connection worth drawing is that journald captures the SAME two streams from
 // Course 2, with no log wiring anywhere. The last band is the section's own claim that the loop is the

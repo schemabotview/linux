@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §7 robustness — `set -euo pipefail` is four tokens people copy without knowing what each buys, so the
 // table names the specific bug each one catches. That is the section's real content: not "add this

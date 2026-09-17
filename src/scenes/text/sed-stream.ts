@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §4 sed — s/// is 90% of it and the difference between `/` and `/g` is one character, so the two forms
 // have to sit on adjacent lines to be seen at all. -i gets its own node because it is the one flag here

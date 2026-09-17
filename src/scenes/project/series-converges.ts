@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §11 you-are-here — the one capstone scene WITHOUT the board, deliberately: the section steps back
 // from the tool to the series, so the picture changes from "nine stages" to "seven courses". A table,

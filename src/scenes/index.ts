@@ -1,4 +1,4 @@
-import type { Scene } from '../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { kernelScenes } from './kernel'
 import { shellScenes } from './shell'
 import { filesystemScenes } from './filesystem'

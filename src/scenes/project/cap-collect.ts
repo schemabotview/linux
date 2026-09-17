@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { stagesBoard } from './stages'
 
 // §4 collect — one function per source, which is the stage's whole argument: each is named, testable

@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { operatorSurface } from './operator-surface'
 import { accountFiles } from './account-files'
 import { borrowingRoot } from './borrowing-root'

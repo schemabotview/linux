@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { stagesBoard } from './stages'
 
 // §9 harden — four safeguards against four specific 3 a.m. failures, so the band names the failure

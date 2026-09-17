@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §3 finding — this is a SEARCH, so the scene is the search: the builtin check first (which is why
 // `cd` must be a builtin at all), then PATH walked in order, first match wins, and the number the

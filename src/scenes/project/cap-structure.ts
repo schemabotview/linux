@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { stagesBoard } from './stages'
 
 // §2 structure — a runnable stub on day one, then grown. The card is deliberately short: the point of

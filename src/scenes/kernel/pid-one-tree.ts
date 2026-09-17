@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { machineStack } from './machine-stack'
 
 // §5 init-systemd — rung 5 lit. The claim underneath is ancestry ("follow every parent up and you

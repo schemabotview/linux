@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §1 what-is-a-process — the section's key move is one-to-MANY: one file on disk, three live
 // instances, each with its own everything. So the scene is one node fanning into three identical-

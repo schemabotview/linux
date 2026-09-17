@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §3 fhs-you — the section's line is that two of these branches are "windows into the running kernel,
 // not files on any disk". That is a contrast, so the scene is two columns and nothing else: the same

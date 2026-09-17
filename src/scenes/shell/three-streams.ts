@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §8 streams — the section's real point is that there are TWO outputs, not one, and that they are
 // separate underneath even though both land on the same screen. So the scene forks on the way out:

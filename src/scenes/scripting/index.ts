@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { commandsToProgram } from './commands-to-program'
 import { runnableFile } from './runnable-file'
 import { varsAndArgs } from './vars-and-args'

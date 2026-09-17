@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §2 users — /etc/passwd IS a table, one row per account, and reading two real rows makes the section's
 // two numeric facts self-evident: root is UID 0, and human accounts start at 1000. The band below is

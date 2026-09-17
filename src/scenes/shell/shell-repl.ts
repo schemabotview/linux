@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §1 what-is-a-shell — the section's framing is "a REPL for the operating system", so the loop is the
 // left column and drawn as an actual cycle of stages; the right column is the three reasons the

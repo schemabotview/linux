@@ -1,4 +1,4 @@
-import type { SceneNode } from '../../render-engine'
+import type { SceneNode } from '@graphlearning/flow'
 
 // The nine-stage board, shared by every scene in the capstone. §1's narration promises "the nine
 // stages on this board", so the board has to be real and has to be the same object in every section —

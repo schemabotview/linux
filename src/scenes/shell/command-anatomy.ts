@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §2 anatomy — a claim about WHICH WORD does what needs the words on screen, so this is a code card:
 // the same listing written four ways, with the bundling and long-option rules visible as real lines

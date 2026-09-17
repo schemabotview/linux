@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { machineStack } from './machine-stack'
 
 // §4 kernel-boot — rung 3 lit, and the narration says to watch the kernel layer in the middle of the

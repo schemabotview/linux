@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §6 functions — a bash function has TWO ways out and they are used for different jobs, which is the
 // thing people get wrong. Drawn as a fork below the card: the exit code is what an `if` reads, the

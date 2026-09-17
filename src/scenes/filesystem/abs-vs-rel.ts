@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §4 paths — a path is literal text, and the difference between the two kinds only shows when you can
 // see where you were standing when you typed them. Hence a session rather than a diagram: the same

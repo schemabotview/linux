@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { machineStack } from './machine-stack'
 
 // §8 subsystems — the ring 0 layer lit, and the band opens it up. Four peers, each rationing one

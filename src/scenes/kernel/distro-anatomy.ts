@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { machineStack } from './machine-stack'
 
 // §6 userspace-distros — rung 6 lit, the top of the ladder. The narration points straight at the cake

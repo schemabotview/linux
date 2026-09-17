@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §3 sudo — the section is an argument against a habit, so the scene is the two habits side by side.
 // The left column is not "root is bad", it is the two specific things that go wrong; the right column

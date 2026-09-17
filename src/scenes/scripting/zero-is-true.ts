@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §4 conditionals — the whole section rests on one idea carried over from Course 2: `if` does not test
 // an expression, it runs a command and looks at the exit code. Stating that as the top band first makes

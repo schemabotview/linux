@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { stagesBoard } from './stages'
 
 // §8 service — a timer needs something to trigger, and every line of this unit is a callback: oneshot

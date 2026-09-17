@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §1 the-tree — two claims in one: there is only ONE root (not C:, D:, E:), and things that are not
 // documents still appear on it as files. So the root is a single node and the band below is

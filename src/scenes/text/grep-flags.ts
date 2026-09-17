@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §2 grep — flags are literal text and the whole section is a list of them, so the card is the
 // section. Written as a real session with a comment per line, because "-v inverts" means nothing until

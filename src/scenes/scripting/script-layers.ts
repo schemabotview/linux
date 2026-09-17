@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §9 you-are-here — the course added capability in layers, each of which is a different kind of thing
 // (it runs / it takes input / it has structure / you can trust it). The recap is those four layers,

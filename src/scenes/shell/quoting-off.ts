@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §6 quoting — the section calls the unquoted variable "the #1 shell bug", and a bug is only
 // convincing when you can see it misfire. So the card runs the same variable four ways and shows what

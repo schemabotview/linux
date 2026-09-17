@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §2 fhs-system — four peers, no flow between them, so no edges inside the box. The node below is not
 // a fifth directory: it is the consequence the section draws from all four being plain text, which is

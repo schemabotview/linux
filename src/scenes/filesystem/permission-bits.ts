@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §5 permissions-read — the nine bits ARE a three-by-three grid, so the scene draws the grid rather
 // than describing it: the table below is literally `-rw-r--r--` with the columns named. Real ls -l

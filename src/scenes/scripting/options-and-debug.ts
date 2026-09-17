@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §8 args-debug — the polish that turns a personal script into one you can hand over. getopts is the
 // card; the two debugging tools are a pair below it because the section's own framing is that you need

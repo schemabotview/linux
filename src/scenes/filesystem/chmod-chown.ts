@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §6 permissions-change — octal only makes sense if you can see the sum land on the triad it produces,
 // so every chmod line carries its result as a comment. root gets its own node rather than a bullet:

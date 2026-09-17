@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §10 you-are-here — the course followed one process from birth to death, so the recap is that same
 // arc in four beats rather than a list of commands: born, alive, spoken to, dead. Each card names the

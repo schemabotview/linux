@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §7 scheduling — five time fields only make sense in column alignment, so this is a code card with the
 // header comment lined up over real schedules. The two things that bite come after: cron's bare

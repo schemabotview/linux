@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { oneRoot } from './one-root'
 import { fhsSystemDirs } from './fhs-system-dirs'
 import { realVsVirtual } from './real-vs-virtual'

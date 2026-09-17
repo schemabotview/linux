@@ -8,6 +8,11 @@ live in the workspace [`CLAUDE.md`](../CLAUDE.md) — read that first; this file
 **BUILT + PUBLISHED — all 8 courses.** 80 sections · 80 scenes · 80 wavs (146.6 min). `npm run build`,
 `tsc --noEmit` and `npm run check` are clean.
 
+The render engine is the **`@graphlearning/flow`** package (repo `schemabotview/ui-flow`) — pinned by
+version, so an engine change never lands here until this repo upgrades and re-verifies. Scene
+`service` nodes use the engine's shared orange, not `--brand`; the Linux amber still drives the app
+chrome.
+
 Live at **https://graphl.in/linux/** since 2026-09-01 (Pages build source = the `deploy.yml`
 workflow; the apex domain is inherited from `schemabotview.github.io`'s CNAME, so no CNAME here).
 Listed in the catalog's `concepts.json`. This repo previously held the beat-based *graphl-studio*
@@ -47,7 +52,6 @@ future edit:
 ## Layout
 
 ```
-src/render-engine/   layout + renderer (import from the barrel index, never deep paths)
 src/scenes/<course>/ scenes + registry — one scene per section, no sharing except the two boards above
 src/content/<course>/ sections (NN-<id>.ts) + registry
 src/section/         scene-left / slide-right composited view (responsive)

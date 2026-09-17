@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { machineStack } from './machine-stack'
 
 // §2 firmware — rung 1 lit. The narration says "we start at the very bottom of the ladder", so the

@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §1 unix-philosophy — the toolkit is a set of peers, so it is a board, not a chain. The node below is
 // the property that makes the board composable at all: every one of them reads stdin and writes

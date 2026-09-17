@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { machineStack } from './machine-stack'
 
 // §7 user-vs-kernel — the turn: the course stops climbing and starts descending. The narration calls

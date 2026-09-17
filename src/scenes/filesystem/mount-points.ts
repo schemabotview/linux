@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §9 mounts — the devices are the foundation and the tree is what stands on them, so the flow runs
 // BT: a mount points UP at the directory it appears under. The edge is drawn band-to-band because the

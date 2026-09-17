@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §1 operating-a-box — five areas that do not flow into each other, so they are a board. The loop
 // below is the section's actual mindset claim, and it IS a cycle: read the config, take the privilege,

@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §8 networking — the section follows a path and then hands you a ladder, and the ladder's rungs map
 // one-to-one onto the path's hops. Drawing both as chains, one above the other, makes that alignment

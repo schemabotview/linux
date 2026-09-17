@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §10 you-are-here — the recap is deliberately shaped like the pipeline the course built toward, not
 // like a tool list: what you can find, change, compute, reshape and act on, and then the composition

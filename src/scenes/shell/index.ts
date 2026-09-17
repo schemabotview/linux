@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { shellRepl } from './shell-repl'
 import { commandAnatomy } from './command-anatomy'
 import { pathSearch } from './path-search'

@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §10 you-are-here — five areas, each named by the command you would actually type, because that is
 // what the course handed over. The next-course card points at the thing all of these have in common:

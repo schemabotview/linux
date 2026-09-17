@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { stagesBoard } from './stages'
 
 // §7 schedule — two ways to do the same thing, so both are on the card and the band names the one

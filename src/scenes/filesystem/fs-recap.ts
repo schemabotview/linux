@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §10 you-are-here — the course went down through four layers, so the recap is those four layers in
 // order rather than a topic list: the map you read, the address you type, the gate that stops you, and

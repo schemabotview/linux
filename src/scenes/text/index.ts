@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { doOneThing } from './do-one-thing'
 import { grepFlags } from './grep-flags'
 import { regexSymbols } from './regex-symbols'

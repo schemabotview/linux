@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { osReferee } from './os-referee'
 import { firmwareHandoff } from './firmware-handoff'
 import { grubLoads } from './grub-loads'

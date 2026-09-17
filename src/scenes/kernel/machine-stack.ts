@@ -1,4 +1,4 @@
-import type { SceneNode } from '../../render-engine'
+import type { SceneNode } from '@graphlearning/flow'
 
 // The `machine-stack` board, shared by every scene in the kernel course.
 //

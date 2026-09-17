@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §8 priority — the scale is counter-intuitive (lower means greedier), so it is drawn as a scale with
 // both ends labelled rather than explained in prose. The caveat gets its own node because it is the

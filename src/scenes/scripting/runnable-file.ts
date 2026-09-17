@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §2 anatomy — three separate things have to be true before a text file will run, and each fails in a
 // different way, so they are three cards rather than a sentence. The ./ card carries the reason the

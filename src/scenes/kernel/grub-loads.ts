@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { machineStack } from './machine-stack'
 
 // §3 bootloader — rung 2 lit. The narration names the pattern the ribbon is drawing: each rung is

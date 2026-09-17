@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §10 you-are-here — the bookend hangs the course's whole vocabulary back on the eval loop from §4,
 // so the recap is that loop annotated: one stage per card, and what you can now do at it. That is

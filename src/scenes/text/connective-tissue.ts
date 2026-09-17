@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §6 reshape — five peers, then the one idiom worth memorising. The idiom is a card rather than a
 // sixth tile because the ORDER is the teaching: uniq only collapses ADJACENT duplicates, so sort has

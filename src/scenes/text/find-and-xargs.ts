@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §7 find-xargs — the pair only makes sense once you know WHY xargs exists, and that reason is a
 // mismatch between two interfaces, so it gets its own node. The -print0 line is on the card because

@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { machineStack } from './machine-stack'
 
 // §9 drivers — the bottom of the descent, drivers lit. The split is WHAT vs HOW: the four managers

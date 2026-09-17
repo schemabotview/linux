@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §6 signals — a signal is a name, a number and a default action, which is a row. The catchable column
 // is the one that matters: read it and you can see why -9 is a last resort rather than a shortcut, and

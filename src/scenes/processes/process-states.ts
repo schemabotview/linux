@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §4 states-scheduler — these states are exactly what the STATE column of ps prints, so the scene is
 // that column: a real table, one row per letter. Read down the CPU column and the section's headline

@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §4 systemd-services — the section names one thing to keep straight, so that is the last band and the
 // scene builds to it. start and enable are one keystroke apart, mean completely different things, and

@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §7 monitoring-look — the section says /proc is the raw truth and "everything else reads this", so
 // the scene puts /proc underneath and has both tools point down at it. Flowing BT makes the dependency

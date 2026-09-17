@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §9 which-tool — a decision guide is a lookup, so it is a table: the want you have on the left, the
 // tool on the right. The rule below is the one that stops the table being read as a rigid mapping —

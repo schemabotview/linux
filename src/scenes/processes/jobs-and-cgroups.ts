@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §9 jobs-cgroups — two levers at opposite scales, so two columns. The pairing is deliberate: the
 // left one turns out to be signals from §6 wearing a shell interface, and the right one turns out to

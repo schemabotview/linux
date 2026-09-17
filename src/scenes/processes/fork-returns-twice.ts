@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §2 fork — "fork() returns twice" is a claim about one line of code, so the line has to be on screen.
 // The if/else is the whole mechanism: same source, two processes, and each one takes a different

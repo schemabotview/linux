@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §5 loops — the section calls the read idiom the one to memorise, so it is the centre of the card
 // rather than a footnote. The warn node carries the rule that actually breaks people's scripts: a

@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §8 links — both kinds are "two names, one file" in conversation, and completely different in the
 // inode model. Side by side, the difference is the shape: on the left two names arrive at ONE inode

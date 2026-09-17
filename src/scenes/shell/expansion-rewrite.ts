@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §5 expansion — the section's one rule is "the command never sees the star". That is a claim about
 // what the program RECEIVES versus what you typed, so both lines have to be on screen together; a

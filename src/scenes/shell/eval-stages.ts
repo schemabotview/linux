@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §4 the-loop — the section's punchline is that the shell TRANSFORMS your line before it runs
 // anything, so the four stages are folded at exactly that boundary rather than drawn as a flat

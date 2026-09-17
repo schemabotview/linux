@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §8 pipeline — the payoff scene. The command has to be on screen in full, because the claim is that
 // six small tools compose into one line; the band underneath is the same line read as a sentence, which

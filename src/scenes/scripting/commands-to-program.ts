@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §1 why-script — the section's framing is that scripting is not a new language, it is the shell you
 // already have plus four constructs. So the scene is deliberately additive: the reasons on top, and

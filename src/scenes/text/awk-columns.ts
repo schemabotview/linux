@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §5 awk — the variables come first because everything below is unreadable without them, and they are
 // a two-column reference, so: a table. The section's own claim is that awk is the one that thinks

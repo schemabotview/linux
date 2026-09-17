@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §6 packages — three properties, then the commands, then the comparison the section actually cares
 // about. The curl-pipe-bash card is a warn node rather than a bullet because it is the one place this

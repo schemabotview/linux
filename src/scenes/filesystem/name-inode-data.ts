@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §7 inodes — the section's surprise is that the inode has NO NAME in it. Drawn as a real table, that
 // is visible rather than asserted: you can read every field the inode holds and see that a name is not

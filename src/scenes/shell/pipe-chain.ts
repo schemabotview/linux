@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §9 pipes — two halves. Redirection is vocabulary, so it is a code card (the exact operators, on
 // real lines). A pipe is a genuine FLOW between processes, so it is drawn as one: three programs, and

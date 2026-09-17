@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §7 exec — the section's hook is that this is the SAME fork+exec the kernel used to start PID 1, so
 // the scene names that link on the first edge. The last band is a pair rather than a single card

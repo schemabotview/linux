@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { machineStack } from './machine-stack'
 
 // §10 you-are-here — the board unlit again, whole, exactly as §1 first showed it. The narration reads

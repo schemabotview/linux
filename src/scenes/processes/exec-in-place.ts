@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §3 exec-tree — the number is the argument. Both ends of this scene are PID 2102, because exec
 // creates nothing: it replaces a program inside a process that already exists. The middle band is the

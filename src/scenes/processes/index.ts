@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 import { programVsProcess } from './program-vs-process'
 import { forkReturnsTwice } from './fork-returns-twice'
 import { execInPlace } from './exec-in-place'

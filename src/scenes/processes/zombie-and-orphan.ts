@@ -1,4 +1,4 @@
-import type { Scene } from '../../render-engine'
+import type { Scene } from '@graphlearning/flow'
 
 // §5 exit-zombie — the normal path and the two ways it goes wrong, side by side, because the failure
 // modes only make sense against the sequence they break. The left column is a real chain: the husk
