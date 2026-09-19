@@ -54,9 +54,12 @@ future edit:
 ```
 src/scenes/<course>/ scenes + registry — one scene per section, no sharing except the two boards above
 src/content/<course>/ sections (NN-<id>.ts) + registry
-src/section/         scene-left / slide-right composited view (responsive)
-src/App.tsx          hash router: section (whole-scene) view · scene (individual) view
-scripts/             record-course · record-reels · thumb · gen-descriptions · colab · audio-manifest
+src/main.tsx         mounts <ConceptApp> — the whole app; the router, section view,
+                     slide panel, catalog and narration are @graphlearning/shell
+src/theme.css        this repo's three brand tokens — its entire design surface
+scripts/             concept.json (publishing identity) · titles.json · colab notebook ·
+                     audio-manifest. The record/capture/thumb TOOLS are
+                     @graphlearning/shell bins (npm run record · thumb · gen:desc · …)
 public/audio/<course>/<section-id>.wav    narration, one clip per section (no beat index)
 ```
 
